@@ -12,15 +12,19 @@ import org.xml.sax.SAXException;
 
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapData.FindPathDataListenerCallback;
+import com.skp.Tmap.TMapData.FindTitlePOIListenerCallback;
 import com.skp.Tmap.TMapData.TMapPathType;
 import com.skp.Tmap.TMapGpsManager;
 import com.skp.Tmap.TMapGpsManager.onLocationChangedCallback;
+import com.skp.Tmap.TMapInfo;
+import com.skp.Tmap.TMapMarkerItem;
 import com.skp.Tmap.TMapMarkerItem2;
 import com.skp.Tmap.TMapPOIItem;
 import com.skp.Tmap.TMapPoint;
 import com.skp.Tmap.TMapPolyLine;
 import com.skp.Tmap.TMapTapi;
 import com.skp.Tmap.TMapView;
+import com.skp.Tmap.TMapView.OnCalloutRightButtonClickCallback;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -139,7 +143,7 @@ public class MainActivity extends Activity {
 	    final TMapGpsManager gps = new TMapGpsManager(this);
 	    gps.setMinTime(1000);
 	    gps.setMinDistance(5);
-	    gps.setProvider(gps.GPS_PROVIDER);
+	    gps.setProvider(TMapGpsManager.GPS_PROVIDER);
 	     	      
 	      
 	    mMainRelativeLayout.addView(mMapView);
@@ -182,7 +186,21 @@ public class MainActivity extends Activity {
 			
 	    //mMapView.setIconVisibility(false);
 			
-
+	    // 마커 클릭 이벤트
+	    /*
+	    mMapView.setOnCalloutRightButtonClickListener(new
+	    		TMapView.OnCalloutRightButtonClickCallback() {
+	    		@Override
+	    		public void onCalloutRightButton(TMapMarkerItem markerItem) {
+	    		
+	    			Toast toastMarkerClick = Toast.makeText(MainActivity.this,
+	    					"POI Name: " + markerItem.getName().toString() + ", " +
+	    	    			"Point: " + markerItem.latitude + ", " + markerItem.longitude, Toast.LENGTH_LONG);
+	    			toastMarkerClick.show();
+	    		}
+	    		});
+	     */
+	  
 	  	// 종료 버튼
 		findViewById(R.id.button1).setOnClickListener(
 				new Button.OnClickListener() {
@@ -240,102 +258,76 @@ public class MainActivity extends Activity {
 
 		final EditText et = (EditText)dia.findViewById(R.id.editText1);
 
+		
 		btn.setOnClickListener(new Button.OnClickListener() {
-
-
-		    @Override
 
 		    public void onClick(View v) {
 
-		        //do something here
-		    	textEndpoint = "";
-		    	//textEndpoint = et.getText();
-		        
-		    	textEndpoint = "항공대";
+		    	//textEndpoint = "";
+		    	//textEndpoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
+		    	textEndpoint = "항공대"; // 테스트용
 		    	
 		    	dia.dismiss();
+		    	//POIItem = tmapdata.findTitlePOI(textEndpoint);
+		   
+		    	 tmapdata.findTitlePOI(textEndpoint, new FindTitlePOIListenerCallback() { 
+		    		
+		    		 @Override
+		    		 public void onFindTitlePOI(ArrayList<TMapPOIItem> poiItem) {
+		    		 for(int i = 0; i < poiItem.size(); i++) {
+		    		 TMapPOIItem item = poiItem.get(i);
+		    		 
+		    		 TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
+		    		 		 
+		    		 //TMapPoint bPoint = new TMapPoint(item.getPOIPoint().getLatitude(), item.getPOIPoint().getLongitude());
+		    		 //tMapMarkerItem.setTMapPoint(bPoint);
+		    		 
+		    		 tMapMarkerItem.latitude = item.getPOIPoint().getLatitude();
+		    		 tMapMarkerItem.longitude = item.getPOIPoint().getLongitude();
+		    		 tMapMarkerItem.setID(item.getPOIID());
+			    	 tMapMarkerItem.setName(item.getPOIID());
+		    		 tMapMarkerItem.setCalloutTitle(item.getPOIID());
+		    		 tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
+		    		
+		    		 
+		    		 //TMapMarkerItem2 tMapMarkerItem2 = new TMapMarkerItem2();
+		    		 //tMapMarkerItem2.latitude = item.getPOIPoint().getLatitude();
+		    		 //tMapMarkerItem2.longitude = item.getPOIPoint().getLongitude();
+		    		 //tMapMarkerItem2.setID(item.getPOIID());
+		    		
+		    		 //tMapMarkerItem.setName(item.getPOIID());
+		    		 //tMapMarkerItem.setCalloutTitle(item.getPOIID());
+		    		 //tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
+		    		 //Bitmap bitmap = BitmapFactory.decodeResource(Context.getResources(),R.drawable.Icon);
+		    		 //tMapMarkerItem2.setIcon(bitmap);
+		    		 
+		    		 if(i==0) mMapView.setCenterPoint(item.getPOIPoint().getLongitude(), item.getPOIPoint().getLatitude());
+		    		 mMapView.addMarkerItem(item.getPOIID(), tMapMarkerItem);
+		    		
+		    		 //mMapView.addTMapPOIItem(poiItem);
+		    		 
+		    		 mMapView.setZoomLevel(15);
+		    		 
+		    		 //TMapInfo info = mMapView.getDisplayTMapInfo(----);
+		    		 }
+		    		 } 
+		 	    	});
 		    	
-		    	/*
-		    	try {
-					POIItem = tmapdata.findTitlePOI(textEndpoint);
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ParserConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (FactoryConfigurationError e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SAXException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-		    	mMapView.addTMapPOIItem(POIItem);
-		    	*/
-		    	
-		    	try {
-					//ArrayList<TMapPOIItem> POIItem = tmapdata.findAroundNamePOI(poiPoint, textEndpoint);
-					POIItem = tmapdata.findTitlePOI(textEndpoint);
-					int i=0;
-					for(i=0; i<POIItem.size(); i++)
-					{
-						//TMapPOIItem item = POIItem.get(i);
-						item = POIItem.get(i);
-						
-						TMapMarkerItem2 tMapMarkerItem2 = new TMapMarkerItem2();
-						TMapPoint tpoint = new TMapPoint(item.getPOIPoint().getLatitude(),
-															item.getPOIPoint().getLongitude());
-						tMapMarkerItem2.setTMapPoint(tpoint);
-						
-						tMapMarkerItem2.setID(item.getPOIID());
-						
-						mMapView.addMarkerItem2("TestID", tMapMarkerItem2);
-						
-						//tMapMarkerItem2.setCanShowCallout(true);
-					}
-				
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ParserConfigurationException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (FactoryConfigurationError e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SAXException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		        
-				
-				
-				
-		    	Toast toastSetEndpoint = Toast.makeText(MainActivity.this,
-		        		"입력한 내용 : "+ textEndpoint, Toast.LENGTH_LONG);
-		        toastSetEndpoint.show();
 		    }
 
 		});
+	
 		
-		
-		// 이동 버튼
+		// 검색 버튼 (구.이동 버튼)
 		findViewById(R.id.button3).setOnClickListener(
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
 		    				mMapView.setIconVisibility(false);
 		    				mMapView.setZoomLevel(16);
-		    				mMapView.setCenterPoint(lonKau, latKau);
+		    				//mMapView.setCenterPoint(lonKau, latKau);
 		    				
-		    				//dia.show();
+		    				
+		    				dia.show();
 		    				//dia.getWindow().setSoftInputMode(
 		    				//		WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		    			}
@@ -367,6 +359,9 @@ public class MainActivity extends Activity {
 				}
 				);
 
+		/*
+		 * 모바일 환경에서 멀티 터치로 화면을 확대축소할 수 있음을 확인, 테스트용 버튼 삭제 -20150428
+		 * 
 		// 확대 버튼
 		findViewById(R.id.button5).setOnClickListener(
 				new Button.OnClickListener() {
@@ -387,7 +382,7 @@ public class MainActivity extends Activity {
 		    			}
 				}
 				);
-		  
+		*/  
 		// 블루투스 버튼
 		findViewById(R.id.button7).setOnClickListener(
 				new Button.OnClickListener() {
@@ -408,6 +403,8 @@ public class MainActivity extends Activity {
 	
 	}
 
+	
+	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
