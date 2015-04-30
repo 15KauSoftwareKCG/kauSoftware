@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
 	
     //Location location = null;
 	//LocationManager lm = null; 
-   
+  
     // 서울 시청 (WGS84) 기본 위치
 	double lat=37.5657321; // 위도
 	double lon=126.9786599; // 경도
