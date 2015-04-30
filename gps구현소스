@@ -1,4 +1,4 @@
-Enter file contents package com.example.tmaptest;
+package com.example.tmaptest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -81,8 +81,8 @@ public class MainActivity extends Activity {
 	double lonCityhall = 126.977119;
 	  
 	// 한국항공대
-	double latKau = -1;
-	double lonKau = -1;
+	double latKau = 37.600624;
+	double lonKau = 126.864388;
 	  
 	// 공덕역
 	double latGongduk = 37.5426981;
@@ -105,6 +105,8 @@ public class MainActivity extends Activity {
 
     LocationManager mLocMgr;
     String locProv;
+    TMapView mMapView;
+    boolean islocation =false;
     
 	private final Handler mHandler = new Handler() {
 		  
@@ -148,7 +150,7 @@ public class MainActivity extends Activity {
 	    
         mLocMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locProv = mLocMgr.getBestProvider(getCriteria(), true);
-	    final TMapView mMapView = new TMapView(this);						// TmapView 생성
+	    mMapView = new TMapView(this);						// TmapView 생성
 	    mMapView.setSKPMapApiKey("e2a7df79-5bc7-3f7f-8bca-2d335a0526e7");	// SDK api key
 	 	 
 	    final TMapGpsManager gps = new TMapGpsManager(this);
@@ -192,35 +194,27 @@ public class MainActivity extends Activity {
 		findViewById(R.id.button2).setOnClickListener(
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
-		    				if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-		    		            alertCheckGPS();
-		    		      }
-		    	            Toast toast=null;
-		    				if(lonMe>=0&&latMe>=0){
-				    				toast = Toast.makeText(MainActivity.this,
-				    						  "GPS (WGS84)\n위도: " + latMe + "\n경도: " + lonMe, Toast.LENGTH_LONG);
-				    				mMapView.setZoomLevel(16); 
-				    				mMapView.setCenterPoint(lonMe, latMe);
-				    				mMapView.setLocationPoint(lonMe, latMe);
-				    				mMapView.setIconVisibility(true);
-				    				
-				    			    ///////////////////////////////////////////////////////
-				    			    TimerTask job = new TimerTask() {
-				    			        public void run() {
-				    			            lonMe=-1;
-				    			            latMe=-1;
-				    			        }
-				    			    };
-				    			    Timer jobScheduler = new Timer();
-				    			    jobScheduler.schedule(job, 10000); //3초마다 자신의 위치를 초기화 하기위함 
-				  
-				    			    //////////////////////////////////////////////////
+		    				if(!islocation){
+			    		        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
+			    				if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			    		            alertCheckGPS();
+			    				}
+			    				Toast toast;
+			    	        	toast = Toast.makeText(MainActivity.this,
+			    						"위치를 탐색합니다.", Toast.LENGTH_LONG);
+			    					
+			    	        	toast.show();
+			    				islocation=true;
 		    				}
-		    				else
-				    				toast = Toast.makeText(MainActivity.this,
-				    					"위치를 파악할 수 없습니다 다시 시도해주세요.", Toast.LENGTH_LONG);
-				    				
-			    			toast.show();
+		    				else{
+		    					mLocMgr.removeUpdates(mLocListener);
+		    					Toast toast;
+		    		        	toast = Toast.makeText(MainActivity.this,
+		    							"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
+		    						
+		    		        	toast.show();
+		    					islocation=false;
+		    				}
 		    			}
 				}
 		);
@@ -240,9 +234,9 @@ public class MainActivity extends Activity {
 
 		    public void onClick(View v) {
 
-		    	//textEndpoint = "";
-		    	//textEndpoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
-		    	textEndpoint = "항공대"; // 테스트용
+		    	textEndpoint = "";
+		    	textEndpoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
+		    	//textEndpoint = "항공대"; // 테스트용
 		    	
 		    	dia.dismiss();
 		    	//POIItem = tmapdata.findTitlePOI(textEndpoint);
@@ -382,24 +376,28 @@ public class MainActivity extends Activity {
         public void onLocationChanged(Location location) {
         	latMe=location.getLatitude();
         	lonMe=location.getLongitude();
+        	
+    		mMapView.setZoomLevel(16); 
+    		mMapView.setCenterPoint(lonMe, latMe);
+    		mMapView.setLocationPoint(lonMe, latMe);
+    		mMapView.setIconVisibility(true);
+			
         }
 
  
 
         public void onProviderDisabled(String provider) {
-
         }
 
  
 
         public void onProviderEnabled(String provider) {
-
         }
 
  
 
         public void onStatusChanged(String provider, int status, Bundle extras) {
-          }
+         }
 
         
 
@@ -427,22 +425,6 @@ public class MainActivity extends Activity {
 
     }
 
-    public void onResume() {
-
-        super.onResume();
-        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
-
-    }
-
- 
-
-    public void onPause() {
-
-        super.onPause();
-
-        mLocMgr.removeUpdates(mLocListener);
-
-    } 
     private void alertCheckGPS() { //gps꺼져있으면 켤꺼지 체크
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("GPS가 꺼져있습니다.(켜시겟습니까?)")
