@@ -71,7 +71,7 @@ public class MainActivity extends Activity {
 	
     //Location location = null;
 	//LocationManager lm = null; 
-  
+   
     // 서울 시청 (WGS84) 기본 위치
 	double lat=37.5657321; // 위도
 	double lon=126.9786599; // 경도
@@ -194,11 +194,12 @@ public class MainActivity extends Activity {
 		findViewById(R.id.button2).setOnClickListener(
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
-		    				if(!islocation){
-			    		        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
-			    				if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		    				if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			    		            alertCheckGPS();
-			    				}
+			    			}
+		    				else if(!islocation){
+			    		        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
+			    				
 			    				Toast toast;
 			    	        	toast = Toast.makeText(MainActivity.this,
 			    						"위치를 탐색합니다.", Toast.LENGTH_LONG);
