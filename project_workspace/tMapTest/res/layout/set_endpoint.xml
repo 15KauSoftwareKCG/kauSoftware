@@ -17,7 +17,7 @@
 
         android:layout_height="wrap_content"
 
-        android:text=" 위치 검색" />
+        android:text="　위치 검색" />
 
     <EditText
 

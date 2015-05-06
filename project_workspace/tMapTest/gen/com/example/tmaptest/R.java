@@ -23,20 +23,25 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
-        public static final int pin_r_s_simple=0x7f020001;
+        public static final int pin_b_b_o=0x7f020001;
+        public static final int pin_b_m_o=0x7f020002;
+        public static final int pin_r_s_simple=0x7f020003;
     }
     public static final class id {
-        public static final int action_settings=0x7f08000b;
+        public static final int action_settings=0x7f08000e;
         public static final int button1=0x7f080001;
         public static final int button2=0x7f080002;
         public static final int button3=0x7f080003;
         public static final int button4=0x7f080004;
         public static final int button7=0x7f080005;
-        public static final int cbutton1=0x7f08000a;
-        public static final int editText1=0x7f080009;
+        public static final int cbutton1=0x7f08000d;
+        public static final int editText1=0x7f08000c;
         public static final int mainRelativeLayout=0x7f080000;
-        public static final int pbutton1=0x7f080008;
-        public static final int pbutton2=0x7f080007;
+        public static final int pAddress=0x7f080009;
+        public static final int pName=0x7f080007;
+        public static final int pPhone=0x7f080008;
+        public static final int pbutton1=0x7f08000b;
+        public static final int pbutton2=0x7f08000a;
         public static final int ptext=0x7f080006;
     }
     public static final class layout {

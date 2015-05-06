@@ -10,10 +10,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
+import com.skp.Tmap.TMapAddressInfo;
 import com.skp.Tmap.TMapData;
 import com.skp.Tmap.TMapData.FindPathDataListenerCallback;
 import com.skp.Tmap.TMapData.FindTitlePOIListenerCallback;
 import com.skp.Tmap.TMapData.TMapPathType;
+import com.skp.Tmap.TMapData.reverseGeocodingListenerCallback;
 import com.skp.Tmap.TMapGpsManager;
 import com.skp.Tmap.TMapGpsManager.onLocationChangedCallback;
 import com.skp.Tmap.TMapInfo;
@@ -90,7 +92,7 @@ public class MainActivity extends Activity {
 	double latGongduk = 37.5426981;
 	double lonGongduk = 126.9516781;
 	  
-	// 자신의 위치
+	// 자신의 위치 (현 서울시청)
 	double latMe=37.5657321;	// 위도
 	double lonMe=126.9786599;	// 경도
 
@@ -101,7 +103,7 @@ public class MainActivity extends Activity {
 	String textEndPoint = "";
 	
 	TMapPOIItem item = new TMapPOIItem();
-	ArrayList<TMapPOIItem> POIItem;
+	ArrayList<TMapPOIItem> POIItem = new ArrayList<TMapPOIItem>();
 	int zoom = 15; // defualt zoom
 	  
 	TMapView mMapView;;
@@ -159,7 +161,7 @@ public class MainActivity extends Activity {
 	    gps.setMinTime(1000);
 	    gps.setMinDistance(5);
 	    gps.setProvider(TMapGpsManager.GPS_PROVIDER);
-	     	      
+	    
 	      
 	    mMainRelativeLayout.addView(mMapView);
 	 
@@ -186,7 +188,9 @@ public class MainActivity extends Activity {
 	    //mMapView.addTMapPath(polyLine); // 경로
 	    //mMapView.addTMapPolyLine("testID",polyLine); // 라인
 
+	    
 	    /*
+	    // 경료 요청
 	    tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
 	    	new FindPathDataListenerCallback() {
 	    		public void onFindPathData(TMapPolyLine polyLine) {
@@ -195,48 +199,181 @@ public class MainActivity extends Activity {
 	    		}
 	    	});
 	    */
-	            
-	      
+     
 		//mMapView.setBicycleInfo(true);
 			
 	    //mMapView.setIconVisibility(false);
-			
-	    
+
+
 	    final Dialog popMarker = new Dialog(MainActivity.this);
 	    popMarker.setContentView(R.layout.marker_popup);
 	    popMarker.setTitle("상세 정보");
 
 		Button popOk = (Button)popMarker.findViewById(R.id.pbutton1);
 		Button popCancle = (Button)popMarker.findViewById(R.id.pbutton2);
-		final TextView textview = (TextView)findViewById(R.id.ptext);
 		
+		//final TextView textview = (TextView)findViewById(R.id.ptext);
+		final TextView pName = (TextView)popMarker.findViewById(R.id.pName);
+		final TextView pPhone = (TextView)popMarker.findViewById(R.id.pPhone);
+		final TextView pAddress = (TextView)popMarker.findViewById(R.id.pAddress);
+			
 	    // 롱클릭 이벤트
 	    mMapView.setOnLongClickListenerCallback(new TMapView.OnLongClickListenerCallback() {
 	    	@Override
 	    	public void onLongPressEvent(ArrayList<TMapMarkerItem>
 	    	markerlist,ArrayList<TMapPOIItem> poilist, TMapPoint point) {
 	    	
-	    		
 	    		if(markerlist.size()>0)
 	    		{
-    				TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
+	    			int check=0;
+	    			TMapMarkerItem temp = new TMapMarkerItem();
 	    			for(int i=0; i<markerlist.size(); i++)
+    				{
+	    				temp = markerlist.get(i);
+	    				for(int j=0; j<POIItem.size(); j++)
+	    				{
+	    					if(temp.getID()==POIItem.get(j).id)
+	    					{
+	    						check=1;
+	    						pName.setText("　이름: "+POIItem.get(j).name);
+	    						
+	    						if(POIItem.get(j).telNo==null) pPhone.setText("　전화번호: ");
+	    						else pPhone.setText("　전화번호: "+POIItem.get(j).telNo);
+	    						
+	    						if(POIItem.get(j).detailAddrName==null)
+	    						{
+	    							pAddress.setText("　주소: "+POIItem.get(j).upperAddrName 
+	    									+ " " + POIItem.get(j).middleAddrName 
+	    									+ " " + POIItem.get(j).lowerAddrName);
+	    						}
+	    						else
+	    						{
+	    							pAddress.setText("　주소: "+POIItem.get(j).upperAddrName 
+	    									+ " " + POIItem.get(j).middleAddrName 
+	    									+ " " + POIItem.get(j).lowerAddrName 
+	    									+ " " + POIItem.get(j).detailAddrName);
+	    						}
+    						}
+	    					if(check==1) break;
+	    				}
+    				}
+	    			if(check==1) popMarker.setTitle("상세 정보");
+	    			else popMarker.setTitle("사용자 지정");
+	    			endPoint.setLatitude(temp.latitude);
+					endPoint.setLongitude(temp.longitude);
+					
+										
+    				popMarker.show();
+	    			/*
+	    			if(poilist.size()>0)
+	    			{
+	    				TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
+	    				TMapPOIItem tMapPOIItem = new TMapPOIItem();
+	    				for(int i=0; i<markerlist.size(); i++)
+	    				{
+	    					//TMapMarkerItem tMapMarkerItem = markerlist.get(i);
+	    					tMapMarkerItem = markerlist.get(i);
+	    					tMapPOIItem = poilist.get(i);
+	    					//mMapView.removeTMapPOIItem(POIItem.get(i).id);
+	    					//if(tMapMarkerItem.latitude == point.getLatitude() && tMapMarkerItem.longitude == point.getLongitude())
+	    					{
+	    						//Toast toastMarkerClick = Toast.makeText(MainActivity.this, 								"Marker Name: " + tMapMarkerItem.getName().toString() + ", " +
+	    						//		"Point: " + tMapMarkerItem.latitude + ", " + tMapMarkerItem.longitude
+	    						//		, Toast.LENGTH_LONG);
+	    						endPoint.setLatitude(tMapPOIItem.getPOIPoint().getLatitude());
+	    						endPoint.setLongitude(tMapPOIItem.getPOIPoint().getLongitude());
+	    				
+	    						pName.setText(tMapPOIItem.name);
+	    						pPhone.setText(tMapPOIItem.telNo);
+	    						pRoadName.setText(tMapPOIItem.roadName);
+	    						//toastMarkerClick.show();
+	    					}
+	    					//mMapView.removeTMapPOIItem(POIItem.get(i).id);
+	    				}
+	    				// 에러 발생
+	    				//pName.setText(tMapMarkerItem.getName());
+	    				//pName.setText(tMapMarkerItem.getName().toString());
+	    				popMarker.setTitle("상세 정보");
+	    				popMarker.show();
+	    			} //if(poilist.size()>0)
+	    			
+	    			// 사용자 지정 마커
+	    			else
+	    			{
+	    				TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
+	    				for(int i=0; i<markerlist.size(); i++)
+	    				{
+	    					//TMapMarkerItem tMapMarkerItem = markerlist.get(i);
+	    					tMapMarkerItem = markerlist.get(i);
+	    					
+	    					//if(tMapMarkerItem.latitude == point.getLatitude() && tMapMarkerItem.longitude == point.getLongitude())
+	    					{
+	    						Toast toastMarkerClick = Toast.makeText(MainActivity.this,
+	    								"Marker Name: " + tMapMarkerItem.getName().toString() + ", " +
+	    								"Point: " + tMapMarkerItem.latitude + ", " + tMapMarkerItem.longitude
+	    								, Toast.LENGTH_LONG);
+	    						endPoint.setLatitude(tMapMarkerItem.latitude);
+	    						endPoint.setLongitude(tMapMarkerItem.longitude);
+	    				
+	    						//String Address = tmapdata.convertGpsToAddress(37.566474, 126.985022);
+	    						pName.setText("");
+	    						pPhone.setText("");
+	    						pRoadName.setText("");
+	    						toastMarkerClick.show();
+	    					}
+	    				}
+	    				popMarker.setTitle("사용자 지정");
+	    				popMarker.show();
+	    			} // 사용자 지정 마크 끝
+	    			*/
+	    		} // if(markerlist.size()>0)
+	    		
+	    		// 사용자 마커 추기하기
+	    		else
+	    		{
+	    			TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
+	    			tMapMarkerItem.setID("userSelect");
+			    	tMapMarkerItem.setName("사용자 지정");
+			    	tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
+			    	tMapMarkerItem.setTMapPoint(point);
+			    	Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.pin_b_b_o);
+			    	tMapMarkerItem.setIcon(bitmap);
+			    	
+			    	mMapView.addMarkerItem(tMapMarkerItem.getID(), tMapMarkerItem);
+			    	pName.setText("");
+					pPhone.setText("");
+					pAddress.setText("");
+			    	popMarker.setTitle("사용자 지정");
+			    	
+			    	endPoint.setLatitude(tMapMarkerItem.latitude);
+					endPoint.setLongitude(tMapMarkerItem.longitude);
+			    	popMarker.show();
+	    		}
+	    		/*
+	    		else if(poilist.size()>0)
+	    		{
+	    			TMapPOIItem tMapPOIItem = new TMapPOIItem();
+	    			for(int i=0; i<poilist.size(); i++)
 	    			{
 	    				//TMapMarkerItem tMapMarkerItem = markerlist.get(i);
-	    				tMapMarkerItem = markerlist.get(i);
+	    				tMapPOIItem = poilist.get(i);
 	    	    		
-	    				//if(tMapMarkerItem.latitude == point.getLatitude() && tMapMarkerItem.longitude == point.getLongitude())
+	    				//if(tMapPOIItem.getPOIPoint().getLatitude() == point.getLatitude() && tMapPOIItem.getPOIPoint().getLongitude() == point.getLongitude())
 	    				{
-	    				Toast toastMarkerClick = Toast.makeText(MainActivity.this,
-	        					"POI Name: " + tMapMarkerItem.getName().toString() + ", " +
-	        	    			"Point: " + tMapMarkerItem.latitude + ", " + tMapMarkerItem.longitude, Toast.LENGTH_LONG);
-	        			toastMarkerClick.show();
-	    				//textview.setText("이름 : "+ tMapMarkerItem.getName().toString() + "\n끝");
+	    				
+	    				endPoint.setLatitude(tMapPOIItem.getPOIPoint().getLatitude());
+	        			endPoint.setLongitude(tMapPOIItem.getPOIPoint().getLongitude());
+	    				
+	        			//pName.setText(tMapPOIItem.name);
+	        			//pPhone.setText(tMapPOIItem.telNo);
+	        			
+	        			//textview.setText("이름 : "+ tMapMarkerItem.getName().toString() + "\n끝");
 		    			}
 	    			}
 	    			//textview.setText("이름 : "+ tMapMarkerItem.getName().toString() + "\n끝");
 	    			popMarker.show();
 	    		}
+	    		*/
 	    	}
 	    	
 	    	});
@@ -247,9 +384,26 @@ public class MainActivity extends Activity {
 		    public void onClick(View v) {
 
 		    	popMarker.dismiss();
+		    	//startPoint = TMapPoint(latCityhall, lonCityhall);
+		    	startPoint.setLatitude(latMe);
+		    	startPoint.setLongitude(lonMe);
 		    	
-		    	
-		    	
+		    	tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
+			    		new FindPathDataListenerCallback() {
+			    		public void onFindPathData(TMapPolyLine polyLine) {
+			    			polyLine.setLineColor(Color.BLUE);
+			    			mMapView.addTMapPath(polyLine);
+			    		}
+			    }
+				);
+		    	//mMapView.setCenterPoint((startPoint.getLongitude() + endPoint.getLongitude())/2
+		    	//		,(startPoint.getLatitude() + endPoint.getLatitude())/2);
+		    	ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
+		    	point.add(startPoint);
+		    	point.add(endPoint);
+		    	TMapInfo info = mMapView.getDisplayTMapInfo(point);
+		    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
+		    	mMapView.setZoomLevel(info.getTMapZoomLevel()); 
 		    }
 
 		});
@@ -258,8 +412,6 @@ public class MainActivity extends Activity {
 		    public void onClick(View v) {
 
 		    	popMarker.dismiss();
-		    	
-		    	
 		    	
 		    }
 
@@ -399,7 +551,8 @@ public class MainActivity extends Activity {
 
 		    	//textEndPoint = "";
 		    	//textEndPoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
-		    	textEndPoint = "항공대"; // 테스트용
+		    	textEndPoint = "서울역"; // 테스트용
+		    	 
 		    	
 		    	dia.dismiss();
 		    	//POIItem = tmapdata.findTitlePOI(textEndPoint);
@@ -408,6 +561,14 @@ public class MainActivity extends Activity {
 		    		
 		    		@Override
 		    		public void onFindTitlePOI(ArrayList<TMapPOIItem> poiItem) {
+		    		ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
+		    		
+		    		if(POIItem.isEmpty()==false) POIItem.clear();
+		    		for(int k=0; k<poiItem.size(); k++)
+		    		{
+		    		POIItem.add(poiItem.get(k));
+		    		}
+		    		
 		    		for(int i = 0; i < poiItem.size(); i++) {
 		    		TMapPOIItem item = poiItem.get(i);
 		    		 
@@ -422,13 +583,15 @@ public class MainActivity extends Activity {
 			    	tMapMarkerItem.setName(item.getPOIName());
 		    		tMapMarkerItem.setCalloutTitle(item.getPOIName());
 		    		if(item.telNo==null) tMapMarkerItem.setCalloutSubTitle("☎:"); 
-		    		else
-		    		tMapMarkerItem.setCalloutSubTitle("☎: "+item.telNo);
+		    		else tMapMarkerItem.setCalloutSubTitle("☎: "+item.telNo);
 		    		tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
-		    		 
 		    		tMapMarkerItem.setCanShowCallout(true);
-			    		
-		    		 
+		    		tMapMarkerItem.setPosition((float)0.5, (float)1.0);
+		    		
+		    		point.add(item.getPOIPoint());
+		    		mMapView.bringMarkerToFront(tMapMarkerItem);
+		    				 
+		    		/*
 		    		TMapMarkerItem2 tMapMarkerItem2 = new TMapMarkerItem2();
 		    		//tMapMarkerItem2.latitude = item.getPOIPoint().getLatitude();
 		    		//tMapMarkerItem2.longitude = item.getPOIPoint().getLongitude();
@@ -440,16 +603,22 @@ public class MainActivity extends Activity {
 		    		
 		    		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_s_simple);
 		    		tMapMarkerItem2.setIcon(bitmap);
+		    		*/
 		    		
-		    		if(i==0) mMapView.setCenterPoint(item.getPOIPoint().getLongitude(), item.getPOIPoint().getLatitude());
+		    		//mMapView.addTMapPOIItem(poiItem);
+		    		
+		    		//if(i==0) mMapView.setCenterPoint(item.getPOIPoint().getLongitude(), item.getPOIPoint().getLatitude());
 		    		mMapView.addMarkerItem(item.getPOIID(), tMapMarkerItem);
 		    		//mMapView.addMarkerItem2(item.getPOIID(), tMapMarkerItem2);
 			    	//mMapView.addTMapPOIItem(poiItem);
 		    		
-		    		mMapView.setZoomLevel(14);
+		    		//mMapView.setZoomLevel(14);
 		    		
 		    		//TMapInfo info = mMapView.getDisplayTMapInfo();
-		    		}
+		    		} // for
+		    		TMapInfo info = mMapView.getDisplayTMapInfo(point);
+			    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
+			    	mMapView.setZoomLevel(info.getTMapZoomLevel());
 		    		} 
 		 	    });
 		    	
