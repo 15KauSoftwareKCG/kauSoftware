@@ -143,9 +143,8 @@ public class MainActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 
-	    setContentView(R.layout.activity_main);
+	    setContentView(R.layout.test1);
 	 
-	    mMainRelativeLayout =(RelativeLayout)findViewById(R.id.mainRelativeLayout);
 	 
 	    // BluetoothService 클래스 생성
 	    if(btService == null) {
@@ -163,7 +162,6 @@ public class MainActivity extends Activity {
 	    gps.setProvider(TMapGpsManager.GPS_PROVIDER);
 	    
 	      
-	    mMainRelativeLayout.addView(mMapView);
 	 
 	    final TMapData tmapdata = new TMapData();
 	     
@@ -462,256 +460,265 @@ public class MainActivity extends Activity {
 	    	});
 	  	*/
 	  
-	  	// 종료 버튼
-		findViewById(R.id.button1).setOnClickListener(
+	  	
+	    //////////////////////////////////////////////////지도보기를 눌리면 이쪽으로 이동
+		findViewById(R.id.map).setOnClickListener(
 				new Button.OnClickListener() {
-		    			public void onClick(View v) {
-		    				gps.CloseGps();
-		    				islocation=false;
-		    				finish();
-		    			  }
-		    		  }
-		    		  );
-		      
-		// GPS 버튼
-		findViewById(R.id.button2).setOnClickListener(
-				new Button.OnClickListener() {
-		    			public void onClick(View v) {
-		    			/*
-		    			//lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);  
-		    			//lat = location.getLatitude();
-		    			//lon = location.getLongitude();
-		    			  	
-		    			int Satellite = gps.getSatellite();
-		    				  
-		    			if(Satellite==0)
-		    			{
-		    				Toast toastNoSatellite = Toast.makeText(MainActivity.this,
-		    							  "연결된 GPS 위성이 없습니다.", Toast.LENGTH_LONG);
-		    				toastNoSatellite.show();
-		    			}
-		    			else
-		    			{
-		    				gps.OpenGps();
-		    				TMapPoint point = gps.getLocation();
-		    				latMe = point.getLatitude();
-		    				lonMe = point.getLongitude();
-		    			}
-		    				  
-		    				  
-		    			Toast toast = Toast.makeText(MainActivity.this,
-		    					  "GPS (WGS84)\n위도: " + latMe + "\n경도: " + lonMe, Toast.LENGTH_LONG);
-		    			mMapView.setZoomLevel(16); 
-		    			mMapView.setCenterPoint(lonMe, latMe);
-		    			mMapView.setIconVisibility(true);
-		    			toast.show();
-			 	    			 
-		    			*/
-		    			if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-		    		            alertCheckGPS();
-		    			}
-	    				else if(!islocation){
-		    		        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
-		    				
-		    				Toast toast;
-		    	        	toast = Toast.makeText(MainActivity.this,
-		    						"위치를 탐색합니다.", Toast.LENGTH_LONG);
-		    					
-		    	        	toast.show();
-		    				islocation=true;
-	    				}
-	    				else{
-	    					mLocMgr.removeUpdates(mLocListener);
-	    					Toast toast;
-	    		        	toast = Toast.makeText(MainActivity.this,
-	    							"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
-	    						
-	    		        	toast.show();
-	    					islocation=false;
-	    				}
-		    		}
-				}
-			   	);
-		 
-		// 입력창
-		final Dialog dia = new Dialog(MainActivity.this);
+	    			public void onClick(View v) {
+	    				setContentView(R.layout.activity_main);	   
 
-		dia.setContentView(R.layout.set_endpoint);
+	    			    mMainRelativeLayout =(RelativeLayout)findViewById(R.id.mainRelativeLayout);
+	    				mMainRelativeLayout.addView(mMapView);
+	    				// 종료 버튼
+	    				findViewById(R.id.button1).setOnClickListener(
+	    						new Button.OnClickListener() {
+	    				    			public void onClick(View v) {
+	    				    				gps.CloseGps();
+	    				    				islocation=false;
+	    				    				finish();
+	    				    			  }
+	    				    		  }
+	    				    		  );
+	    				      
+	    				
+	    				// GPS 버튼
+	    				findViewById(R.id.button2).setOnClickListener(
+	    						new Button.OnClickListener() {
+	    				    			public void onClick(View v) {
+	    				    			/*
+	    				    			//lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);  
+	    				    			//lat = location.getLatitude();
+	    				    			//lon = location.getLongitude();
+	    				    			  	
+	    				    			int Satellite = gps.getSatellite();
+	    				    				  
+	    				    			if(Satellite==0)
+	    				    			{
+	    				    				Toast toastNoSatellite = Toast.makeText(MainActivity.this,
+	    				    							  "연결된 GPS 위성이 없습니다.", Toast.LENGTH_LONG);
+	    				    				toastNoSatellite.show();
+	    				    			}
+	    				    			else
+	    				    			{
+	    				    				gps.OpenGps();
+	    				    				TMapPoint point = gps.getLocation();
+	    				    				latMe = point.getLatitude();
+	    				    				lonMe = point.getLongitude();
+	    				    			}
+	    				    				  
+	    				    				  
+	    				    			Toast toast = Toast.makeText(MainActivity.this,
+	    				    					  "GPS (WGS84)\n위도: " + latMe + "\n경도: " + lonMe, Toast.LENGTH_LONG);
+	    				    			mMapView.setZoomLevel(16); 
+	    				    			mMapView.setCenterPoint(lonMe, latMe);
+	    				    			mMapView.setIconVisibility(true);
+	    				    			toast.show();
+	    					 	    			 
+	    				    			*/
+	    				    			if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+	    				    		            alertCheckGPS();
+	    				    			}
+	    			    				else if(!islocation){
+	    				    		        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
+	    				    				
+	    				    				Toast toast;
+	    				    	        	toast = Toast.makeText(MainActivity.this,
+	    				    						"위치를 탐색합니다.", Toast.LENGTH_LONG);
+	    				    					
+	    				    	        	toast.show();
+	    				    				islocation=true;
+	    			    				}
+	    			    				else{
+	    			    					mLocMgr.removeUpdates(mLocListener);
+	    			    					Toast toast;
+	    			    		        	toast = Toast.makeText(MainActivity.this,
+	    			    							"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
+	    			    						
+	    			    		        	toast.show();
+	    			    					islocation=false;
+	    			    				}
+	    				    		}
+	    						}
+	    					   	);
 
-		dia.setTitle("장소 검색");
+	    				// 입력창
+	    				final Dialog dia = new Dialog(MainActivity.this);
 
-		Button btn = (Button)dia.findViewById(R.id.cbutton1);
+	    				dia.setContentView(R.layout.set_endpoint);
 
-		final EditText et = (EditText)dia.findViewById(R.id.editText1);
+	    				dia.setTitle("장소 검색");
 
-		// 입력창 버튼 클릭
-		btn.setOnClickListener(new Button.OnClickListener() {
+	    				Button btn = (Button)dia.findViewById(R.id.cbutton1);
 
-		    public void onClick(View v) {
+	    				final EditText et = (EditText)dia.findViewById(R.id.editText1);
 
-		    	//textEndPoint = "";
-		    	//textEndPoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
-		    	textEndPoint = "서울역"; // 테스트용
-		    	 
-		    	
-		    	dia.dismiss();
-		    	//POIItem = tmapdata.findTitlePOI(textEndPoint);
-		   
-		    	tmapdata.findTitlePOI(textEndPoint, new FindTitlePOIListenerCallback() { 
-		    		
-		    		@Override
-		    		public void onFindTitlePOI(ArrayList<TMapPOIItem> poiItem) {
-		    		ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
-		    		
-		    		if(POIItem.isEmpty()==false) POIItem.clear();
-		    		for(int k=0; k<poiItem.size(); k++)
-		    		{
-		    		POIItem.add(poiItem.get(k));
-		    		}
-		    		
-		    		for(int i = 0; i < poiItem.size(); i++) {
-		    		TMapPOIItem item = poiItem.get(i);
-		    		 
-		    		TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
-		    		 		 
-		    		//TMapPoint markerPoint = new TMapPoint(item.getPOIPoint().getLatitude(), item.getPOIPoint().getLongitude());
-		    		
-		    		//tMapMarkerItem.latitude = item.getPOIPoint().getLatitude();
-		    		//tMapMarkerItem.longitude = item.getPOIPoint().getLongitude();
-		    		tMapMarkerItem.setTMapPoint(item.getPOIPoint());
-		    		tMapMarkerItem.setID(item.getPOIID());
-			    	tMapMarkerItem.setName(item.getPOIName());
-		    		tMapMarkerItem.setCalloutTitle(item.getPOIName());
-		    		if(item.telNo==null) tMapMarkerItem.setCalloutSubTitle("☎:"); 
-		    		else tMapMarkerItem.setCalloutSubTitle("☎: "+item.telNo);
-		    		tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
-		    		tMapMarkerItem.setCanShowCallout(true);
-		    		tMapMarkerItem.setPosition((float)0.5, (float)1.0);
-		    		
-		    		point.add(item.getPOIPoint());
-		    		mMapView.bringMarkerToFront(tMapMarkerItem);
-		    				 
-		    		/*
-		    		TMapMarkerItem2 tMapMarkerItem2 = new TMapMarkerItem2();
-		    		//tMapMarkerItem2.latitude = item.getPOIPoint().getLatitude();
-		    		//tMapMarkerItem2.longitude = item.getPOIPoint().getLongitude();
-		    		//tMapMarkerItem2.setTMapPoint(markerPoint);
-		    		tMapMarkerItem2.setTMapPoint(item.getPOIPoint());
-		    		
-		    		tMapMarkerItem2.setID(item.getPOIID());
-		    		tMapMarkerItem2.setPosition(1, 1);
-		    		
-		    		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_s_simple);
-		    		tMapMarkerItem2.setIcon(bitmap);
-		    		*/
-		    		
-		    		//mMapView.addTMapPOIItem(poiItem);
-		    		
-		    		//if(i==0) mMapView.setCenterPoint(item.getPOIPoint().getLongitude(), item.getPOIPoint().getLatitude());
-		    		mMapView.addMarkerItem(item.getPOIID(), tMapMarkerItem);
-		    		//mMapView.addMarkerItem2(item.getPOIID(), tMapMarkerItem2);
-			    	//mMapView.addTMapPOIItem(poiItem);
-		    		
-		    		//mMapView.setZoomLevel(14);
-		    		
-		    		//TMapInfo info = mMapView.getDisplayTMapInfo();
-		    		} // for
-		    		TMapInfo info = mMapView.getDisplayTMapInfo(point);
-			    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
-			    	mMapView.setZoomLevel(info.getTMapZoomLevel());
-		    		} 
-		 	    });
-		    	
-		    }
+	    				dia.findViewById(R.id.map1).setOnClickListener( //지도보기 클릭
+	    						new Button.OnClickListener() {
+	    			    			public void onClick(View v) {
+	    			    				dia.dismiss();
+	    			    			}
+	    						}
+	    				);
+	    				// 입력창 버튼 클릭
+	    				btn.setOnClickListener(new Button.OnClickListener() {
 
-		});
-	
-		
-		// 검색 버튼 (구.이동 버튼)
-		findViewById(R.id.button3).setOnClickListener(
-				new Button.OnClickListener() {
-		    			public void onClick(View v) {
-		    				mMapView.setIconVisibility(false);
-		    				//mMapView.setZoomLevel(16);
-		    				//mMapView.setCenterPoint(lonKau, latKau);
-		    				
-		    				
-		    				dia.show();
-		    				//dia.getWindow().setSoftInputMode(
-		    				//		WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-		    			}
-				}
-				);
-	
-		
-		
-		// 경로 버튼
-		findViewById(R.id.button4).setOnClickListener(		
-				new Button.OnClickListener() {
-		    			public void onClick(View v) {
-		    				mMapView.setIconVisibility(false);
-		    				mMapView.setZoomLevel(12);
-		    				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
-		    			    		new FindPathDataListenerCallback() {
-		    			    		public void onFindPathData(TMapPolyLine polyLine) {
-		    			    			polyLine.setLineColor(Color.BLUE);
-		    			    			mMapView.addTMapPath(polyLine);
-		    			    		}
-		    			    }
-		    				);
-		    				  
-		    				//mMapView.setCenterPoint((startPoint.getLongitude() + endPoint.getLongitude())/2,
-		    				//		(startPoint.getLatitude() + endPoint.getLongitude()/2));
-		    				mMapView.setCenterPoint((lonCityhall + lonKau)/2, (latCityhall + latKau)/2);
-		    				//mMapView.setCenterPoint((lonCityhall + lonSoowon)/2, (latCityhall + latSoowon)/2);
-		    			}
-		    		  
-				}
-				);
+	    				    public void onClick(View v) {
 
-		/*
-		 * 모바일 환경에서 멀티 터치로 화면을 확대축소할 수 있음을 확인, 테스트용 버튼 삭제 -20150428
-		 * 
-		// 확대 버튼
-		findViewById(R.id.button5).setOnClickListener(
-				new Button.OnClickListener() {
-		    			public void onClick(View v) {
-		    				mMapView.setIconVisibility(false);
-		    				mMapView.MapZoomIn();
-		    			}
-		    		  
-				}
-		    	);
+	    				    	//textEndPoint = "";
+	    				    	//textEndPoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
+	    				    	textEndPoint = "서울역"; // 테스트용
+	    				    	 
+	    				    	
+	    				    	//dia.dismiss();
+	    				    	//POIItem = tmapdata.findTitlePOI(textEndPoint);
+	    				   
+	    				    	tmapdata.findTitlePOI(textEndPoint, new FindTitlePOIListenerCallback() { 
+	    				    		
+	    				    		@Override
+	    				    		public void onFindTitlePOI(ArrayList<TMapPOIItem> poiItem) {
+	    				    		ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
+	    				    		
+	    				    		if(POIItem.isEmpty()==false) POIItem.clear();
+	    				    		for(int k=0; k<poiItem.size(); k++)
+	    				    		{
+	    				    		POIItem.add(poiItem.get(k));
+	    				    		}
+	    				    		
+	    				    		for(int i = 0; i < poiItem.size(); i++) {
+	    				    		TMapPOIItem item = poiItem.get(i);
+	    				    		 
+	    				    		TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
+	    				    		 		 
+	    				    		//TMapPoint markerPoint = new TMapPoint(item.getPOIPoint().getLatitude(), item.getPOIPoint().getLongitude());
+	    				    		
+	    				    		//tMapMarkerItem.latitude = item.getPOIPoint().getLatitude();
+	    				    		//tMapMarkerItem.longitude = item.getPOIPoint().getLongitude();
+	    				    		tMapMarkerItem.setTMapPoint(item.getPOIPoint());
+	    				    		tMapMarkerItem.setID(item.getPOIID());
+	    					    	tMapMarkerItem.setName(item.getPOIName());
+	    				    		tMapMarkerItem.setCalloutTitle(item.getPOIName());
+	    				    		if(item.telNo==null) tMapMarkerItem.setCalloutSubTitle("☎:"); 
+	    				    		else tMapMarkerItem.setCalloutSubTitle("☎: "+item.telNo);
+	    				    		tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
+	    				    		tMapMarkerItem.setCanShowCallout(true);
+	    				    		tMapMarkerItem.setPosition((float)0.5, (float)1.0);
+	    				    		
+	    				    		point.add(item.getPOIPoint());
+	    				    		mMapView.bringMarkerToFront(tMapMarkerItem);
+	    				    				 
+	    				    		
+	    				    		//mMapView.addTMapPOIItem(poiItem);
+	    				    		
+	    				    		//if(i==0) mMapView.setCenterPoint(item.getPOIPoint().getLongitude(), item.getPOIPoint().getLatitude());
+	    				    		mMapView.addMarkerItem(item.getPOIID(), tMapMarkerItem);
+	    				    		//mMapView.addMarkerItem2(item.getPOIID(), tMapMarkerItem2);
+	    					    	//mMapView.addTMapPOIItem(poiItem);
+	    				    		
+	    				    		//mMapView.setZoomLevel(14);
+	    				    		
+	    				    		//TMapInfo info = mMapView.getDisplayTMapInfo();
+	    				    		} // for
+	    				    		TMapInfo info = mMapView.getDisplayTMapInfo(point);
+	    					    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
+	    					    	mMapView.setZoomLevel(info.getTMapZoomLevel());
+	    				    		} 
+	    				 	    });
+	    				    	
+	    				    }
 
-		// 축소 버튼
-		findViewById(R.id.button6).setOnClickListener(
-				new Button.OnClickListener() {
-		    			public void onClick(View v) {
-		    				mMapView.setIconVisibility(false);
-		    				mMapView.MapZoomOut();
-		    			}
-				}
-				);
-		*/  
-		// 블루투스 버튼
-		findViewById(R.id.button7).setOnClickListener(
-				new Button.OnClickListener() {
-					public void onClick(View v) {
-						if(btService.getDeviceState()) {
-							// 블루투스가 지원 가능한 기기일 때
-							btService.enableBluetooth();
-						}
-						else {
-							Toast toastBluetooth = Toast.makeText(MainActivity.this,
-									"블루투스가 지원되지 않는 기기입니다.", Toast.LENGTH_LONG);
-							toastBluetooth.show();
-		    			    //finish();
-						}
-					}
-				}
-				);
-	
-		
+	    				    
+	    				});
+	    			
+	    				
+	    				// 검색 버튼 (구.이동 버튼)
+	    				findViewById(R.id.button3).setOnClickListener(
+	    						new Button.OnClickListener() {
+	    				    			public void onClick(View v) {
+	    				    				mMapView.setIconVisibility(false);
+	    				    				//mMapView.setZoomLevel(16);
+	    				    				//mMapView.setCenterPoint(lonKau, latKau);
+	    				    				
+	    				    				
+	    				    				dia.show();
+	    				    				//dia.getWindow().setSoftInputMode(
+	    				    				//		WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+	    				    			}
+	    						}
+	    						);
+	    			
+	    				
+	    				
+	    				// 경로 버튼
+	    				findViewById(R.id.button4).setOnClickListener(		
+	    						new Button.OnClickListener() {
+	    				    			public void onClick(View v) {
+	    				    				mMapView.setIconVisibility(false);
+	    				    				mMapView.setZoomLevel(12);
+	    				    				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
+	    				    			    		new FindPathDataListenerCallback() {
+	    				    			    		public void onFindPathData(TMapPolyLine polyLine) {
+	    				    			    			polyLine.setLineColor(Color.BLUE);
+	    				    			    			mMapView.addTMapPath(polyLine);
+	    				    			    		}
+	    				    			    }
+	    				    				);
+	    				    				  
+	    				    				//mMapView.setCenterPoint((startPoint.getLongitude() + endPoint.getLongitude())/2,
+	    				    				//		(startPoint.getLatitude() + endPoint.getLongitude()/2));
+	    				    				mMapView.setCenterPoint((lonCityhall + lonKau)/2, (latCityhall + latKau)/2);
+	    				    				//mMapView.setCenterPoint((lonCityhall + lonSoowon)/2, (latCityhall + latSoowon)/2);
+	    				    			}
+	    				    		  
+	    						}
+	    						);
+
+	    				/*
+	    				 * 모바일 환경에서 멀티 터치로 화면을 확대축소할 수 있음을 확인, 테스트용 버튼 삭제 -20150428
+	    				 * 
+	    				// 확대 버튼
+	    				findViewById(R.id.button5).setOnClickListener(
+	    						new Button.OnClickListener() {
+	    				    			public void onClick(View v) {
+	    				    				mMapView.setIconVisibility(false);
+	    				    				mMapView.MapZoomIn();
+	    				    			}
+	    				    		  
+	    						}
+	    				    	);
+
+	    				// 축소 버튼
+	    				findViewById(R.id.button6).setOnClickListener(
+	    						new Button.OnClickListener() {
+	    				    			public void onClick(View v) {
+	    				    				mMapView.setIconVisibility(false);
+	    				    				mMapView.MapZoomOut();
+	    				    			}
+	    						}
+	    						);
+	    				*/  
+	    				// 블루투스 버튼
+	    				findViewById(R.id.button7).setOnClickListener(
+	    						new Button.OnClickListener() {
+	    							public void onClick(View v) {
+	    								if(btService.getDeviceState()) {
+	    									// 블루투스가 지원 가능한 기기일 때
+	    									btService.enableBluetooth();
+	    								}
+	    								else {
+	    									Toast toastBluetooth = Toast.makeText(MainActivity.this,
+	    											"블루투스가 지원되지 않는 기기입니다.", Toast.LENGTH_LONG);
+	    									toastBluetooth.show();
+	    				    			    //finish();
+	    								}
+	    							}
+	    						}
+	    						);
+	    			
+
+	    			  }
+	    		  }
+	    		  );
+	      		
 	}
 
 	
