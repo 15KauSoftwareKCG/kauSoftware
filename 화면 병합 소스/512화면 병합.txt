@@ -76,27 +76,27 @@ public class MainActivity extends Activity {
     //Location location = null;
 	//LocationManager lm = null; 
    
-    // ì„œìš¸ ì‹œì²­ (WGS84) ê¸°ë³¸ ìœ„ì¹˜
-	double lat=37.5657321; // ìœ„ë„
-	double lon=126.9786599; // ê²½ë„
+    // ¼­¿ï ½ÃÃ» (WGS84) ±âº» À§Ä¡
+	double lat=37.5657321; // À§µµ
+	double lon=126.9786599; // °æµµ
 	  
-	// ì‹œì²­ì—­
+	// ½ÃÃ»¿ª
 	double latCityhall = 37.56544;
 	double lonCityhall = 126.977119;
 	  
-	// í•œêµ­í•­ê³µëŒ€
+	// ÇÑ±¹Ç×°ø´ë
 	double latKau = 37.600624;
 	double lonKau = 126.864388;
 	  
-	// ê³µë•ì—­
+	// °ø´ö¿ª
 	double latGongduk = 37.5426981;
 	double lonGongduk = 126.9516781;
 	  
-	// ìì‹ ì˜ ìœ„ì¹˜ (í˜„ ì„œìš¸ì‹œì²­)
-	double latMe=37.5657321;	// ìœ„ë„
-	double lonMe=126.9786599;	// ê²½ë„
+	// ÀÚ½ÅÀÇ À§Ä¡ (Çö ¼­¿ï½ÃÃ»)
+	double latMe=37.5657321;	// À§µµ
+	double lonMe=126.9786599;	// °æµµ
 
-	// ìˆ˜ì›ì—­
+	// ¼ö¿ø¿ª
 	double latSoowon = 37.265669;
 	double lonSoowon = 127.000223;
 		
@@ -127,11 +127,11 @@ public class MainActivity extends Activity {
 	        case REQUEST_ENABLE_BT:
 	            // When the request to enable Bluetooth returns
 	            if (resultCode == Activity.RESULT_OK) {
-	                // í™•ì¸ ëˆŒë €ì„ ë•Œ
+	                // È®ÀÎ ´­·¶À» ¶§
 	                //Next Step
 	            }
 	            else {
-	                // ì·¨ì†Œ ëˆŒë €ì„ ë•Œ
+	                // Ãë¼Ò ´­·¶À» ¶§
 	                Log.d(TAG, "Bluetooth is not enabled");
 	            }
 	            break;
@@ -146,14 +146,14 @@ public class MainActivity extends Activity {
 	    setContentView(R.layout.test1);
 	 
 	 
-	    // BluetoothService í´ë˜ìŠ¤ ìƒì„±
+	    // BluetoothService Å¬·¡½º »ı¼º
 	    if(btService == null) {
 	    	btService = new BluetoothService(this, mHandler);
 	    }
 	      
 	    mLocMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locProv = mLocMgr.getBestProvider(getCriteria(), true);
-	    final TMapView mMapView = new TMapView(this);						// TmapView ìƒì„±
+	    final TMapView mMapView = new TMapView(this);						// TmapView »ı¼º
 	    mMapView.setSKPMapApiKey("e2a7df79-5bc7-3f7f-8bca-2d335a0526e7");	// SDK api key
 	 	 
 	    final TMapGpsManager gps = new TMapGpsManager(this);
@@ -183,12 +183,12 @@ public class MainActivity extends Activity {
 	      
 	    polyLine.setLineWidth(3);
 	    //polyLine.setLineColor(Color.BLUE);
-	    //mMapView.addTMapPath(polyLine); // ê²½ë¡œ
-	    //mMapView.addTMapPolyLine("testID",polyLine); // ë¼ì¸
+	    //mMapView.addTMapPath(polyLine); // °æ·Î
+	    //mMapView.addTMapPolyLine("testID",polyLine); // ¶óÀÎ
 
 	    
 	    /*
-	    // ê²½ë£Œ ìš”ì²­
+	    // °æ·á ¿äÃ»
 	    tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
 	    	new FindPathDataListenerCallback() {
 	    		public void onFindPathData(TMapPolyLine polyLine) {
@@ -205,7 +205,7 @@ public class MainActivity extends Activity {
 
 	    final Dialog popMarker = new Dialog(MainActivity.this);
 	    popMarker.setContentView(R.layout.marker_popup);
-	    popMarker.setTitle("ìƒì„¸ ì •ë³´");
+	    popMarker.setTitle("»ó¼¼ Á¤º¸");
 
 		Button popOk = (Button)popMarker.findViewById(R.id.pbutton1);
 		Button popCancle = (Button)popMarker.findViewById(R.id.pbutton2);
@@ -215,7 +215,7 @@ public class MainActivity extends Activity {
 		final TextView pPhone = (TextView)popMarker.findViewById(R.id.pPhone);
 		final TextView pAddress = (TextView)popMarker.findViewById(R.id.pAddress);
 			
-	    // ë¡±í´ë¦­ ì´ë²¤íŠ¸
+	    // ·ÕÅ¬¸¯ ÀÌº¥Æ®
 	    mMapView.setOnLongClickListenerCallback(new TMapView.OnLongClickListenerCallback() {
 	    	@Override
 	    	public void onLongPressEvent(ArrayList<TMapMarkerItem>
@@ -233,20 +233,20 @@ public class MainActivity extends Activity {
 	    					if(temp.getID()==POIItem.get(j).id)
 	    					{
 	    						check=1;
-	    						pName.setText("ã€€ì´ë¦„: "+POIItem.get(j).name);
+	    						pName.setText("¡¡ÀÌ¸§: "+POIItem.get(j).name);
 	    						
-	    						if(POIItem.get(j).telNo==null) pPhone.setText("ã€€ì „í™”ë²ˆí˜¸: ");
-	    						else pPhone.setText("ã€€ì „í™”ë²ˆí˜¸: "+POIItem.get(j).telNo);
+	    						if(POIItem.get(j).telNo==null) pPhone.setText("¡¡ÀüÈ­¹øÈ£: ");
+	    						else pPhone.setText("¡¡ÀüÈ­¹øÈ£: "+POIItem.get(j).telNo);
 	    						
 	    						if(POIItem.get(j).detailAddrName==null)
 	    						{
-	    							pAddress.setText("ã€€ì£¼ì†Œ: "+POIItem.get(j).upperAddrName 
+	    							pAddress.setText("¡¡ÁÖ¼Ò: "+POIItem.get(j).upperAddrName 
 	    									+ " " + POIItem.get(j).middleAddrName 
 	    									+ " " + POIItem.get(j).lowerAddrName);
 	    						}
 	    						else
 	    						{
-	    							pAddress.setText("ã€€ì£¼ì†Œ: "+POIItem.get(j).upperAddrName 
+	    							pAddress.setText("¡¡ÁÖ¼Ò: "+POIItem.get(j).upperAddrName 
 	    									+ " " + POIItem.get(j).middleAddrName 
 	    									+ " " + POIItem.get(j).lowerAddrName 
 	    									+ " " + POIItem.get(j).detailAddrName);
@@ -255,8 +255,8 @@ public class MainActivity extends Activity {
 	    					if(check==1) break;
 	    				}
     				}
-	    			if(check==1) popMarker.setTitle("ìƒì„¸ ì •ë³´");
-	    			else popMarker.setTitle("ì‚¬ìš©ì ì§€ì •");
+	    			if(check==1) popMarker.setTitle("»ó¼¼ Á¤º¸");
+	    			else popMarker.setTitle("»ç¿ëÀÚ ÁöÁ¤");
 	    			endPoint.setLatitude(temp.latitude);
 					endPoint.setLongitude(temp.longitude);
 					
@@ -288,14 +288,14 @@ public class MainActivity extends Activity {
 	    					}
 	    					//mMapView.removeTMapPOIItem(POIItem.get(i).id);
 	    				}
-	    				// ì—ëŸ¬ ë°œìƒ
+	    				// ¿¡·¯ ¹ß»ı
 	    				//pName.setText(tMapMarkerItem.getName());
 	    				//pName.setText(tMapMarkerItem.getName().toString());
-	    				popMarker.setTitle("ìƒì„¸ ì •ë³´");
+	    				popMarker.setTitle("»ó¼¼ Á¤º¸");
 	    				popMarker.show();
 	    			} //if(poilist.size()>0)
 	    			
-	    			// ì‚¬ìš©ì ì§€ì • ë§ˆì»¤
+	    			// »ç¿ëÀÚ ÁöÁ¤ ¸¶Ä¿
 	    			else
 	    			{
 	    				TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
@@ -320,18 +320,18 @@ public class MainActivity extends Activity {
 	    						toastMarkerClick.show();
 	    					}
 	    				}
-	    				popMarker.setTitle("ì‚¬ìš©ì ì§€ì •");
+	    				popMarker.setTitle("»ç¿ëÀÚ ÁöÁ¤");
 	    				popMarker.show();
-	    			} // ì‚¬ìš©ì ì§€ì • ë§ˆí¬ ë
+	    			} // »ç¿ëÀÚ ÁöÁ¤ ¸¶Å© ³¡
 	    			*/
 	    		} // if(markerlist.size()>0)
 	    		
-	    		// ì‚¬ìš©ì ë§ˆì»¤ ì¶”ê¸°í•˜ê¸°
+	    		// »ç¿ëÀÚ ¸¶Ä¿ Ãß±âÇÏ±â
 	    		else
 	    		{
 	    			TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
 	    			tMapMarkerItem.setID("userSelect");
-			    	tMapMarkerItem.setName("ì‚¬ìš©ì ì§€ì •");
+			    	tMapMarkerItem.setName("»ç¿ëÀÚ ÁöÁ¤");
 			    	tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
 			    	tMapMarkerItem.setTMapPoint(point);
 			    	Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.pin_b_b_o);
@@ -341,7 +341,7 @@ public class MainActivity extends Activity {
 			    	pName.setText("");
 					pPhone.setText("");
 					pAddress.setText("");
-			    	popMarker.setTitle("ì‚¬ìš©ì ì§€ì •");
+			    	popMarker.setTitle("»ç¿ëÀÚ ÁöÁ¤");
 			    	
 			    	endPoint.setLatitude(tMapMarkerItem.latitude);
 					endPoint.setLongitude(tMapMarkerItem.longitude);
@@ -365,10 +365,10 @@ public class MainActivity extends Activity {
 	        			//pName.setText(tMapPOIItem.name);
 	        			//pPhone.setText(tMapPOIItem.telNo);
 	        			
-	        			//textview.setText("ì´ë¦„ : "+ tMapMarkerItem.getName().toString() + "\në");
+	        			//textview.setText("ÀÌ¸§ : "+ tMapMarkerItem.getName().toString() + "\n³¡");
 		    			}
 	    			}
-	    			//textview.setText("ì´ë¦„ : "+ tMapMarkerItem.getName().toString() + "\në");
+	    			//textview.setText("ÀÌ¸§ : "+ tMapMarkerItem.getName().toString() + "\n³¡");
 	    			popMarker.show();
 	    		}
 	    		*/
@@ -376,7 +376,7 @@ public class MainActivity extends Activity {
 	    	
 	    	});
 	    
-	    // ìƒì„¸ì •ë³´ ë²„íŠ¼
+	    // »ó¼¼Á¤º¸ ¹öÆ°
 	    popOk.setOnClickListener(new Button.OnClickListener() {
 
 		    public void onClick(View v) {
@@ -416,7 +416,7 @@ public class MainActivity extends Activity {
 		});
 	    
 	    
-	    // í’ì„ ë·° í´ë¦­ ì´ë²¤íŠ¸
+	    // Ç³¼±ºä Å¬¸¯ ÀÌº¥Æ®
 	    /*
 	    mMapView.setOnCalloutRightButtonClickListener(new
 	    		TMapView.OnCalloutRightButtonClickCallback() {
@@ -468,7 +468,7 @@ public class MainActivity extends Activity {
 	    				
 	    				mMainRelativeLayout =(RelativeLayout)findViewById(R.id.mainRelativeLayout); 
 	    				mMainRelativeLayout.addView(mMapView);
-	    				// ì¢…ë£Œ ë²„íŠ¼
+	    				// Á¾·á ¹öÆ°
 	    				findViewById(R.id.button1).setOnClickListener(
 	    						new Button.OnClickListener() {
 	    				    			public void onClick(View v) {
@@ -479,7 +479,7 @@ public class MainActivity extends Activity {
 	    				    		  }
 	    				    		  );
 	    				      
-	    				// GPS ë²„íŠ¼
+	    				// GPS ¹öÆ°
 	    				findViewById(R.id.button2).setOnClickListener(
 	    						new Button.OnClickListener() {
 	    				    			public void onClick(View v) {
@@ -493,7 +493,7 @@ public class MainActivity extends Activity {
 	    				    			if(Satellite==0)
 	    				    			{
 	    				    				Toast toastNoSatellite = Toast.makeText(MainActivity.this,
-	    				    							  "ì—°ê²°ëœ GPS ìœ„ì„±ì´ ì—†ìŠµë‹ˆë‹¤.", Toast.LENGTH_LONG);
+	    				    							  "¿¬°áµÈ GPS À§¼ºÀÌ ¾ø½À´Ï´Ù.", Toast.LENGTH_LONG);
 	    				    				toastNoSatellite.show();
 	    				    			}
 	    				    			else
@@ -506,7 +506,7 @@ public class MainActivity extends Activity {
 	    				    				  
 	    				    				  
 	    				    			Toast toast = Toast.makeText(MainActivity.this,
-	    				    					  "GPS (WGS84)\nìœ„ë„: " + latMe + "\nê²½ë„: " + lonMe, Toast.LENGTH_LONG);
+	    				    					  "GPS (WGS84)\nÀ§µµ: " + latMe + "\n°æµµ: " + lonMe, Toast.LENGTH_LONG);
 	    				    			mMapView.setZoomLevel(16); 
 	    				    			mMapView.setCenterPoint(lonMe, latMe);
 	    				    			mMapView.setIconVisibility(true);
@@ -521,7 +521,7 @@ public class MainActivity extends Activity {
 	    				    				
 	    				    				Toast toast;
 	    				    	        	toast = Toast.makeText(MainActivity.this,
-	    				    						"ìœ„ì¹˜ë¥¼ íƒìƒ‰í•©ë‹ˆë‹¤.", Toast.LENGTH_LONG);
+	    				    						"À§Ä¡¸¦ Å½»öÇÕ´Ï´Ù.", Toast.LENGTH_LONG);
 	    				    					
 	    				    	        	toast.show();
 	    				    				islocation=true;
@@ -530,7 +530,7 @@ public class MainActivity extends Activity {
 	    			    					mLocMgr.removeUpdates(mLocListener);
 	    			    					Toast toast;
 	    			    		        	toast = Toast.makeText(MainActivity.this,
-	    			    							"ìœ„ì¹˜íƒìƒ‰ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.", Toast.LENGTH_LONG);
+	    			    							"À§Ä¡Å½»öÀ» Á¾·áÇÕ´Ï´Ù.", Toast.LENGTH_LONG);
 	    			    						
 	    			    		        	toast.show();
 	    			    					islocation=false;
@@ -540,25 +540,25 @@ public class MainActivity extends Activity {
 	    					   	);
 	    				 
 	    				//
-	    				// ì…ë ¥ì°½
+	    				// ÀÔ·ÂÃ¢
 	    				final Dialog dia = new Dialog(MainActivity.this);
 
 	    				dia.setContentView(R.layout.set_endpoint);
 
-	    				dia.setTitle("ì¥ì†Œ ê²€ìƒ‰");
+	    				dia.setTitle("Àå¼Ò °Ë»ö");
 
 	    				Button btn = (Button)dia.findViewById(R.id.cbutton1);
 
 	    				final EditText et = (EditText)dia.findViewById(R.id.editText1);
 
-	    				// ì…ë ¥ì°½ ë²„íŠ¼ í´ë¦­
+	    				// ÀÔ·ÂÃ¢ ¹öÆ° Å¬¸¯
 	    				btn.setOnClickListener(new Button.OnClickListener() {
 
 	    				    public void onClick(View v) {
 
 	    				    	//textEndPoint = "";
-	    				    	//textEndPoint = et.getText().toString(); // ê°€ìƒíœ´ëŒ€í°ì—ì„œ í•œê¸€ì…ë ¥ ì§€ì›ì•ˆë¨, ì¶”í›„ í™•ì¸
-	    				    	textEndPoint = "ì„œìš¸ì—­"; // í…ŒìŠ¤íŠ¸ìš©
+	    				    	//textEndPoint = et.getText().toString(); // °¡»óÈŞ´ëÆù¿¡¼­ ÇÑ±ÛÀÔ·Â Áö¿ø¾ÈµÊ, ÃßÈÄ È®ÀÎ
+	    				    	textEndPoint = "¼­¿ï¿ª"; // Å×½ºÆ®¿ë
 	    				    	 
 	    				    	
 	    				    	dia.dismiss();
@@ -589,8 +589,8 @@ public class MainActivity extends Activity {
 	    				    		tMapMarkerItem.setID(item.getPOIID());
 	    					    	tMapMarkerItem.setName(item.getPOIName());
 	    				    		tMapMarkerItem.setCalloutTitle(item.getPOIName());
-	    				    		if(item.telNo==null) tMapMarkerItem.setCalloutSubTitle("â˜:"); 
-	    				    		else tMapMarkerItem.setCalloutSubTitle("â˜: "+item.telNo);
+	    				    		if(item.telNo==null) tMapMarkerItem.setCalloutSubTitle("¢Ï:"); 
+	    				    		else tMapMarkerItem.setCalloutSubTitle("¢Ï: "+item.telNo);
 	    				    		tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
 	    				    		tMapMarkerItem.setCanShowCallout(true);
 	    				    		tMapMarkerItem.setPosition((float)0.5, (float)1.0);
@@ -622,7 +622,7 @@ public class MainActivity extends Activity {
 	    				});
 	    			
 	    				
-	    				// ê²€ìƒ‰ ë²„íŠ¼ (êµ¬.ì´ë™ ë²„íŠ¼)
+	    				// °Ë»ö ¹öÆ° (±¸.ÀÌµ¿ ¹öÆ°)
 	    				findViewById(R.id.button3).setOnClickListener(
 	    						new Button.OnClickListener() {
 	    				    			public void onClick(View v) {
@@ -640,7 +640,7 @@ public class MainActivity extends Activity {
 	    			
 	    				
 	    				
-	    				// ê²½ë¡œ ë²„íŠ¼
+	    				// °æ·Î ¹öÆ°
 	    				findViewById(R.id.button4).setOnClickListener(		
 	    						new Button.OnClickListener() {
 	    				    			public void onClick(View v) {
@@ -665,9 +665,9 @@ public class MainActivity extends Activity {
 	    						);
 
 	    				/*
-	    				 * ëª¨ë°”ì¼ í™˜ê²½ì—ì„œ ë©€í‹° í„°ì¹˜ë¡œ í™”ë©´ì„ í™•ëŒ€ì¶•ì†Œí•  ìˆ˜ ìˆìŒì„ í™•ì¸, í…ŒìŠ¤íŠ¸ìš© ë²„íŠ¼ ì‚­ì œ -20150428
+	    				 * ¸ğ¹ÙÀÏ È¯°æ¿¡¼­ ¸ÖÆ¼ ÅÍÄ¡·Î È­¸éÀ» È®´ëÃà¼ÒÇÒ ¼ö ÀÖÀ½À» È®ÀÎ, Å×½ºÆ®¿ë ¹öÆ° »èÁ¦ -20150428
 	    				 * 
-	    				// í™•ëŒ€ ë²„íŠ¼
+	    				// È®´ë ¹öÆ°
 	    				findViewById(R.id.button5).setOnClickListener(
 	    						new Button.OnClickListener() {
 	    				    			public void onClick(View v) {
@@ -678,7 +678,7 @@ public class MainActivity extends Activity {
 	    						}
 	    				    	);
 
-	    				// ì¶•ì†Œ ë²„íŠ¼
+	    				// Ãà¼Ò ¹öÆ°
 	    				findViewById(R.id.button6).setOnClickListener(
 	    						new Button.OnClickListener() {
 	    				    			public void onClick(View v) {
@@ -688,17 +688,17 @@ public class MainActivity extends Activity {
 	    						}
 	    						);
 	    				*/  
-	    				// ë¸”ë£¨íˆ¬ìŠ¤ ë²„íŠ¼
+	    				// ºí·çÅõ½º ¹öÆ°
 	    				findViewById(R.id.button7).setOnClickListener(
 	    						new Button.OnClickListener() {
 	    							public void onClick(View v) {
 	    								if(btService.getDeviceState()) {
-	    									// ë¸”ë£¨íˆ¬ìŠ¤ê°€ ì§€ì› ê°€ëŠ¥í•œ ê¸°ê¸°ì¼ ë•Œ
+	    									// ºí·çÅõ½º°¡ Áö¿ø °¡´ÉÇÑ ±â±âÀÏ ¶§
 	    									btService.enableBluetooth();
 	    								}
 	    								else {
 	    									Toast toastBluetooth = Toast.makeText(MainActivity.this,
-	    											"ë¸”ë£¨íˆ¬ìŠ¤ê°€ ì§€ì›ë˜ì§€ ì•ŠëŠ” ê¸°ê¸°ì…ë‹ˆë‹¤.", Toast.LENGTH_LONG);
+	    											"ºí·çÅõ½º°¡ Áö¿øµÇÁö ¾Ê´Â ±â±âÀÔ´Ï´Ù.", Toast.LENGTH_LONG);
 	    									toastBluetooth.show();
 	    				    			    //finish();
 	    								}
@@ -799,17 +799,17 @@ public class MainActivity extends Activity {
 
     }
 
-    private void alertCheckGPS() { //gpsêº¼ì ¸ìˆìœ¼ë©´ ì¼¤êº¼ì§€ ì²´í¬
+    private void alertCheckGPS() { //gps²¨Á®ÀÖÀ¸¸é ÄÓ²¨Áö Ã¼Å©
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("GPSê°€ êº¼ì ¸ìˆìŠµë‹ˆë‹¤.(ì¼œì‹œê²ŸìŠµë‹ˆê¹Œ?)")
+        builder.setMessage("GPS°¡ ²¨Á®ÀÖ½À´Ï´Ù.(ÄÑ½Ã°Ù½À´Ï±î?)")
                 .setCancelable(false)
-                .setPositiveButton("í™•ì¸",
+                .setPositiveButton("È®ÀÎ",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 moveConfigGPS();
                             }
                     })
-                .setNegativeButton("ì·¨ì†Œ",
+                .setNegativeButton("Ãë¼Ò",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 dialog.cancel();
@@ -819,7 +819,7 @@ public class MainActivity extends Activity {
         alert.show();
     }
 
-    // GPS ì„¤ì •í™”ë©´ìœ¼ë¡œ ì´ë™
+    // GPS ¼³Á¤È­¸éÀ¸·Î ÀÌµ¿
    private void moveConfigGPS() {
         Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivity(gpsOptionsIntent);
