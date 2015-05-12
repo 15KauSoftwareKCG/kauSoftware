@@ -11,7 +11,7 @@
         android:layout_weight="70"
         android:gravity="center"
         android:orientation="vertical"
-		android:background="#ff0000"
+		android:background="#ff2020"
         >
 	
         
@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="120dip"
-            android:text="자전거 네비게이션"
+            android:text="자전거 내비게이션"
             android:textSize="23sp" 
             />
         
@@ -50,7 +50,7 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_weight="31.54" 
-    android:background="#00ff00"
+    android:background="#40ff40"
     />
 	
 	<LinearLayout
@@ -58,7 +58,7 @@
     android:layout_height="match_parent"
     android:layout_weight="4.71"
     android:orientation="vertical"
-    android:background="#0000ff"
+    android:background="#2D2Dff"
     >
     
     	<Button
