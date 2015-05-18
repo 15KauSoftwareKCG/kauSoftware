@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
 	    gps.setMinDistance(5);
 	    gps.setProvider(TMapGpsManager.GPS_PROVIDER);
 	    
-	    final Dialog dia = new Dialog(MainActivity.this);;      
+	    final Dialog dia = new Dialog(MainActivity.this);
 	 
 	    final TMapData tmapdata = new TMapData();
 	     
@@ -404,7 +404,6 @@ public class MainActivity extends Activity {
 
         final ListView list = (ListView)dia.findViewById(R.id.delist);
         final ListAdapter listadapter = new ListAdapter(dia.getContext(),popMarker,dia,endPoint);
-        list.setAdapter(listadapter);
 
 	    
 		// 확인창 버튼 클릭
@@ -413,17 +412,22 @@ public class MainActivity extends Activity {
 		    public void onClick(View v) {
 
 		    	textEndPoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
-		    	
-		    	
-		    	
-		    	
+		    	listadapter.clear();
 		    	tmapdata.findTitlePOI(textEndPoint, new FindTitlePOIListenerCallback() { 
 		    		
 		    		@Override
 		    		public void onFindTitlePOI(ArrayList<TMapPOIItem> poiItem) {
-		    		listadapter.clear();
+
+		    		if(POIItem.isEmpty()==false)
+    				{
+    					for(int i=0; i<POIItem.size(); i++)
+    					{
+    						TMapPOIItem item = POIItem.get(i);
+    						mMapView.removeMarkerItem(item.getPOIID());
+    					}
+    					POIItem.clear();
+    				}
 		    		
-		    		if(POIItem.isEmpty()==false) POIItem.clear();
 		    		for(int k=0; k<poiItem.size(); k++)
 		    		{
 		    		POIItem.add(poiItem.get(k));
@@ -467,11 +471,12 @@ public class MainActivity extends Activity {
 
 				    	
 		    		} // for
-		    	    }	    				    	   
+
+		            }	    				    	   
+		    		
 		    	});	
 		    	
-		    	//list.setAdapter(new ArrayAdapter(dia.getContext(),android.R.layout.simple_list_item_1,al));
-	    		 
+	            list.setAdapter(listadapter);	    		 
 	    		 dia.dismiss();
 	    		 dia.show();
 		    }	    				    
@@ -486,15 +491,7 @@ public class MainActivity extends Activity {
 		    				//mMapView.setZoomLevel(16);
 		    				//mMapView.setCenterPoint(lonKau, latKau);
 		    				
-		    				if(POIItem.isEmpty()==false)
-		    				{
-		    					for(int i=0; i<POIItem.size(); i++)
-		    					{
-		    						TMapPOIItem item = POIItem.get(i);
-		    						mMapView.removeMarkerItem(item.getPOIID());
-		    					}
-		    					POIItem.clear();
-		    				}
+		    				
 		    				dia.show();
 		    				//dia.getWindow().setSoftInputMode(
 		    				//		WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
