@@ -56,26 +56,6 @@
          android:layout_toRightOf="@+id/button3"
          android:text="경로" />
 
-     <!--  
-     	확대축소 버튼 삭제 - 20150428
-     <Button
-         android:id="@+id/button5"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_weight="1"
-         android:layout_below="@+id/mainRelativeLayout"
-         android:layout_toRightOf="@+id/button4"
-         android:text="확대" />
-
-     <Button
-         android:id="@+id/button6"
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:layout_weight="1"
-         android:layout_below="@+id/mainRelativeLayout"
-         android:layout_toRightOf="@+id/button5"
-         android:text="축소" />
-     -->
      <Button
          android:id="@+id/button7"
          android:layout_width="wrap_content"

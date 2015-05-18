@@ -1,31 +1,13 @@
 package com.example.tmaptest;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.logging.LogManager;
 
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.xml.sax.SAXException;
 
 import com.skp.Tmap.TMapAddressInfo;
@@ -71,8 +53,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -124,9 +108,7 @@ public class MainActivity extends Activity {
 	ArrayList<TMapPOIItem> POIItem = new ArrayList<TMapPOIItem>();
 	int zoom = 15; // defualt zoom
 	  
-	TMapAddressInfo addressInfoSave = new TMapAddressInfo();
-	
-	TMapView mMapView;
+	TMapView mMapView;;
 	LocationManager mLocMgr;
 	String locProv;
 	boolean islocation = false;
@@ -163,10 +145,8 @@ public class MainActivity extends Activity {
 	
 		super.onCreate(savedInstanceState);
 
-	    //setContentView(R.layout.activity_main); //20150512
-	    setContentView(R.layout.menu);
-		
-	    // mMainRelativeLayout =(RelativeLayout)findViewById(R.id.mainRelativeLayout); // 20150512
+	    setContentView(R.layout.activity_main);
+	 
 	 
 	    // BluetoothService 클래스 생성
 	    if(btService == null) {
@@ -175,9 +155,7 @@ public class MainActivity extends Activity {
 	      
 	    mLocMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locProv = mLocMgr.getBestProvider(getCriteria(), true);
-	    //final TMapView mMapView = new TMapView(this);		// TmapView 생성 20150512
 	    mMapView = new TMapView(this);						// TmapView 생성
-	    
 	    mMapView.setSKPMapApiKey("e2a7df79-5bc7-3f7f-8bca-2d335a0526e7");	// SDK api key
 	 	 
 	    final TMapGpsManager gps = new TMapGpsManager(this);
@@ -185,8 +163,7 @@ public class MainActivity extends Activity {
 	    gps.setMinDistance(5);
 	    gps.setProvider(TMapGpsManager.GPS_PROVIDER);
 	    
-	      
-	    // mMainRelativeLayout.addView(mMapView); // 20150512
+	    final Dialog dia = new Dialog(MainActivity.this);;      
 	 
 	    final TMapData tmapdata = new TMapData();
 	     
@@ -281,82 +258,13 @@ public class MainActivity extends Activity {
 	    				}
     				}
 	    			if(check==1) popMarker.setTitle("상세 정보");
-	    			else
-	    			{
-	    				popMarker.setTitle("사용자 지정");
-	    				pName.setText("");
-						pPhone.setText("");
-						//pAddress.setText("");
-						if(addressInfoSave.strFullAddress==null) pAddress.setText("주소: ");
-				    	else pAddress.setText("주소: "+ addressInfoSave.strFullAddress);
-	    			}
+	    			else popMarker.setTitle("사용자 지정");
 	    			endPoint.setLatitude(temp.latitude);
 					endPoint.setLongitude(temp.longitude);
 					
 										
     				popMarker.show();
-	    			/*
-	    			if(poilist.size()>0)
-	    			{
-	    				TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
-	    				TMapPOIItem tMapPOIItem = new TMapPOIItem();
-	    				for(int i=0; i<markerlist.size(); i++)
-	    				{
-	    					//TMapMarkerItem tMapMarkerItem = markerlist.get(i);
-	    					tMapMarkerItem = markerlist.get(i);
-	    					tMapPOIItem = poilist.get(i);
-	    					//mMapView.removeTMapPOIItem(POIItem.get(i).id);
-	    					//if(tMapMarkerItem.latitude == point.getLatitude() && tMapMarkerItem.longitude == point.getLongitude())
-	    					{
-	    						//Toast toastMarkerClick = Toast.makeText(MainActivity.this, 								"Marker Name: " + tMapMarkerItem.getName().toString() + ", " +
-	    						//		"Point: " + tMapMarkerItem.latitude + ", " + tMapMarkerItem.longitude
-	    						//		, Toast.LENGTH_LONG);
-	    						endPoint.setLatitude(tMapPOIItem.getPOIPoint().getLatitude());
-	    						endPoint.setLongitude(tMapPOIItem.getPOIPoint().getLongitude());
-	    				
-	    						pName.setText(tMapPOIItem.name);
-	    						pPhone.setText(tMapPOIItem.telNo);
-	    						pRoadName.setText(tMapPOIItem.roadName);
-	    						//toastMarkerClick.show();
-	    					}
-	    					//mMapView.removeTMapPOIItem(POIItem.get(i).id);
-	    				}
-	    				// 에러 발생
-	    				//pName.setText(tMapMarkerItem.getName());
-	    				//pName.setText(tMapMarkerItem.getName().toString());
-	    				popMarker.setTitle("상세 정보");
-	    				popMarker.show();
-	    			} //if(poilist.size()>0)
 	    			
-	    			// 사용자 지정 마커
-	    			else
-	    			{
-	    				TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
-	    				for(int i=0; i<markerlist.size(); i++)
-	    				{
-	    					//TMapMarkerItem tMapMarkerItem = markerlist.get(i);
-	    					tMapMarkerItem = markerlist.get(i);
-	    					
-	    					//if(tMapMarkerItem.latitude == point.getLatitude() && tMapMarkerItem.longitude == point.getLongitude())
-	    					{
-	    						Toast toastMarkerClick = Toast.makeText(MainActivity.this,
-	    								"Marker Name: " + tMapMarkerItem.getName().toString() + ", " +
-	    								"Point: " + tMapMarkerItem.latitude + ", " + tMapMarkerItem.longitude
-	    								, Toast.LENGTH_LONG);
-	    						endPoint.setLatitude(tMapMarkerItem.latitude);
-	    						endPoint.setLongitude(tMapMarkerItem.longitude);
-	    				
-	    						//String Address = tmapdata.convertGpsToAddress(37.566474, 126.985022);
-	    						pName.setText("");
-	    						pPhone.setText("");
-	    						pRoadName.setText("");
-	    						toastMarkerClick.show();
-	    					}
-	    				}
-	    				popMarker.setTitle("사용자 지정");
-	    				popMarker.show();
-	    			} // 사용자 지정 마크 끝
-	    			*/
 	    		} // if(markerlist.size()>0)
 	    		
 	    		// 사용자 마커 추기하기
@@ -367,58 +275,19 @@ public class MainActivity extends Activity {
 			    	tMapMarkerItem.setName("사용자 지정");
 			    	tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
 			    	tMapMarkerItem.setTMapPoint(point);
-			    	Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.pin_b_bm_o);
+			    	Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.pin_b_b_o);
 			    	tMapMarkerItem.setIcon(bitmap);
-			    	tMapMarkerItem.setPosition((float)0.5, (float)1.0);
 			    	
 			    	mMapView.addMarkerItem(tMapMarkerItem.getID(), tMapMarkerItem);
 			    	pName.setText("");
 					pPhone.setText("");
-					//pAddress.setText("");
+					pAddress.setText("");
 			    	popMarker.setTitle("사용자 지정");
-			    	
-			    	//
-			    	tmapdata.reverseGeocoding(point.getLatitude(), point.getLongitude(), "A03",
-			    			new reverseGeocodingListenerCallback() {
-			    			@Override
-			    			public void onReverseGeocoding(TMapAddressInfo addressInfo) {
-			    			//LogManager.printLog("선택한 위치의 주소는 " + addressInfo.strFullAddress);
-			    				//pAddress.setText(""+ addressInfo.strFullAddress);
-			    				addressInfoSave = addressInfo;
-			    			}
-			    			});
-			    	if(addressInfoSave.strFullAddress==null) pAddress.setText("주소: ");
-			    	else pAddress.setText("주소: "+ addressInfoSave.strFullAddress);
 			    	
 			    	endPoint.setLatitude(tMapMarkerItem.latitude);
 					endPoint.setLongitude(tMapMarkerItem.longitude);
 			    	popMarker.show();
 	    		}
-	    		/*
-	    		else if(poilist.size()>0)
-	    		{
-	    			TMapPOIItem tMapPOIItem = new TMapPOIItem();
-	    			for(int i=0; i<poilist.size(); i++)
-	    			{
-	    				//TMapMarkerItem tMapMarkerItem = markerlist.get(i);
-	    				tMapPOIItem = poilist.get(i);
-	    	    		
-	    				//if(tMapPOIItem.getPOIPoint().getLatitude() == point.getLatitude() && tMapPOIItem.getPOIPoint().getLongitude() == point.getLongitude())
-	    				{
-	    				
-	    				endPoint.setLatitude(tMapPOIItem.getPOIPoint().getLatitude());
-	        			endPoint.setLongitude(tMapPOIItem.getPOIPoint().getLongitude());
-	    				
-	        			//pName.setText(tMapPOIItem.name);
-	        			//pPhone.setText(tMapPOIItem.telNo);
-	        			
-	        			//textview.setText("이름 : "+ tMapMarkerItem.getName().toString() + "\n끝");
-		    			}
-	    			}
-	    			//textview.setText("이름 : "+ tMapMarkerItem.getName().toString() + "\n끝");
-	    			popMarker.show();
-	    		}
-	    		*/
 	    	}
 	    	
 	    	});
@@ -449,6 +318,7 @@ public class MainActivity extends Activity {
 		    	TMapInfo info = mMapView.getDisplayTMapInfo(point);
 		    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
 		    	mMapView.setZoomLevel(info.getTMapZoomLevel()); 
+		    	dia.dismiss();
 		    }
 
 		});
@@ -462,61 +332,9 @@ public class MainActivity extends Activity {
 
 		});
 	    
-	    
-	    // 풍선뷰 클릭 이벤트
-	    /*
-	    mMapView.setOnCalloutRightButtonClickListener(new
-	    		TMapView.OnCalloutRightButtonClickCallback() {
-	    		@Override
-	    		public void onCalloutRightButton(TMapMarkerItem markerItem) {
-	    		
-	    			Toast toastMarkerClick = Toast.makeText(MainActivity.this,
-	    					"POI Name: " + markerItem.getName().toString() + ", " +
-	    	    			"Point: " + markerItem.latitude + ", " + markerItem.longitude, Toast.LENGTH_LONG);
-	    			toastMarkerClick.show();
-	    		}
-	    		});
-	    */
-	    
-	   /*
-	   mMapView.setOnClickListenerCallBack(new TMapView.OnClickListenerCallback() {
-	    	@Override
-	    	public boolean onPressUpEvent(ArrayList<TMapMarkerItem>
-	    	markerlist,ArrayList<TMapPOIItem> poilist, TMapPoint point, PointF pointf) {
-	    		return false;
-	    	}
-	    	@Override
-	    	public boolean onPressEvent(ArrayList<TMapMarkerItem>
-	    	markerlist,ArrayList<TMapPOIItem> poilist, TMapPoint point, PointF pointf) {
-	    		
-	    		if(poilist!=null)
-	    		{
-	    		
-	    		TMapMarkerItem item = markerlist.get(0);
-	    		
-	    		Toast toastMarkerClick = Toast.makeText(MainActivity.this,
-    					"POI Name: " + item.getName().toString() + ", " +
-    	    			"Point: " + item.latitude + ", " + item.longitude, Toast.LENGTH_LONG);
-    			toastMarkerClick.show();
-	    		
-	    		}
-	    		return false;
-	    	}
-	    		    	
-	    	
-	    	});
-	  	*/
-	    
-	    //지도보기를 눌리면 이쪽으로 이동
-	    findViewById(R.id.map).setOnClickListener(
- 				new Button.OnClickListener() {
- 					public void onClick(View v) {
- 							    				setContentView(R.layout.activity_main);	
- 				
 	    mMainRelativeLayout =(RelativeLayout)findViewById(R.id.mainRelativeLayout);
-	    mMainRelativeLayout.addView(mMapView);
-	    
-	  	// 종료 버튼
+		mMainRelativeLayout.addView(mMapView);
+		// 종료 버튼
 		findViewById(R.id.button1).setOnClickListener(
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
@@ -527,45 +345,17 @@ public class MainActivity extends Activity {
 		    		  }
 		    		  );
 		      
+		
 		// GPS 버튼
 		findViewById(R.id.button2).setOnClickListener(
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
-		    			/*
-		    			//lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);  
-		    			//lat = location.getLatitude();
-		    			//lon = location.getLongitude();
-		    			  	
-		    			int Satellite = gps.getSatellite();
-		    				  
-		    			if(Satellite==0)
-		    			{
-		    				Toast toastNoSatellite = Toast.makeText(MainActivity.this,
-		    							  "연결된 GPS 위성이 없습니다.", Toast.LENGTH_LONG);
-		    				toastNoSatellite.show();
-		    			}
-		    			else
-		    			{
-		    				gps.OpenGps();
-		    				TMapPoint point = gps.getLocation();
-		    				latMe = point.getLatitude();
-		    				lonMe = point.getLongitude();
-		    			}
-		    				  
-		    				  
-		    			Toast toast = Toast.makeText(MainActivity.this,
-		    					  "GPS (WGS84)\n위도: " + latMe + "\n경도: " + lonMe, Toast.LENGTH_LONG);
-		    			mMapView.setZoomLevel(16); 
-		    			mMapView.setCenterPoint(lonMe, latMe);
-		    			mMapView.setIconVisibility(true);
-		    			toast.show();
-			 	    			 
-		    			*/
+		    			
 		    			if(!mLocMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 		    		            alertCheckGPS();
 		    			}
 	    				else if(!islocation){
-		    		        mLocMgr.requestLocationUpdates( locProv, 1000, 3, mLocListener );
+		    		        mLocMgr.requestLocationUpdates( LocationManager.GPS_PROVIDER, 3000, 3, mLocListener );
 		    				
 		    				Toast toast;
 		    	        	toast = Toast.makeText(MainActivity.this,
@@ -586,48 +376,65 @@ public class MainActivity extends Activity {
 		    		}
 				}
 			   	);
-		 
+
 		// 입력창
-		final Dialog dia = new Dialog(MainActivity.this);
 
 		dia.setContentView(R.layout.set_endpoint);
 
 		dia.setTitle("장소 검색");
 
-		Button btn = (Button)dia.findViewById(R.id.cbutton1);
+		final Button btn = (Button)dia.findViewById(R.id.cbutton1);
 
 		final EditText et = (EditText)dia.findViewById(R.id.editText1);
 
-		// 입력창 버튼 클릭
+		final ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
+		
+		
+		dia.findViewById(R.id.map1).setOnClickListener( //지도보기 클릭
+				new Button.OnClickListener() {
+	    			public void onClick(View v) {
+	    				TMapInfo info = mMapView.getDisplayTMapInfo(point);
+				    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
+				    	mMapView.setZoomLevel(info.getTMapZoomLevel());
+				    	
+	    				dia.dismiss();
+	    			}
+				}
+		);
+
+        final ListView list = (ListView)dia.findViewById(R.id.delist);
+        final ListAdapter listadapter = new ListAdapter(dia.getContext(),popMarker,dia,endPoint);
+        list.setAdapter(listadapter);
+
+	    
+		// 확인창 버튼 클릭
 		btn.setOnClickListener(new Button.OnClickListener() {
 
 		    public void onClick(View v) {
 
-		    	//textEndPoint = "";
-		    	//textEndPoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
-		    	textEndPoint = "서울역"; // 테스트용
-		    	 
+		    	textEndPoint = et.getText().toString(); // 가상휴대폰에서 한글입력 지원안됨, 추후 확인
 		    	
-		    	dia.dismiss();
-		    	//POIItem = tmapdata.findTitlePOI(textEndPoint);
-		   
+		    	
+		    	
+		    	
 		    	tmapdata.findTitlePOI(textEndPoint, new FindTitlePOIListenerCallback() { 
 		    		
 		    		@Override
 		    		public void onFindTitlePOI(ArrayList<TMapPOIItem> poiItem) {
-		    		ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
+		    		listadapter.clear();
 		    		
 		    		if(POIItem.isEmpty()==false) POIItem.clear();
 		    		for(int k=0; k<poiItem.size(); k++)
 		    		{
 		    		POIItem.add(poiItem.get(k));
 		    		}
-		    		
+		    		point.clear();
 		    		for(int i = 0; i < poiItem.size(); i++) {
 		    		TMapPOIItem item = poiItem.get(i);
 		    		 
 		    		TMapMarkerItem tMapMarkerItem = new TMapMarkerItem();
-		    		 		 
+		    		
+		    		
 		    		//TMapPoint markerPoint = new TMapPoint(item.getPOIPoint().getLatitude(), item.getPOIPoint().getLongitude());
 		    		
 		    		//tMapMarkerItem.latitude = item.getPOIPoint().getLatitude();
@@ -640,26 +447,12 @@ public class MainActivity extends Activity {
 		    		else tMapMarkerItem.setCalloutSubTitle("☎: "+item.telNo);
 		    		tMapMarkerItem.setVisible(tMapMarkerItem.VISIBLE);
 		    		tMapMarkerItem.setCanShowCallout(true);
-		    		Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.pin_r_bm_o);
-			    	tMapMarkerItem.setIcon(bitmap);
 		    		tMapMarkerItem.setPosition((float)0.5, (float)1.0);
 		    		
+		    		listadapter.add(item);
 		    		point.add(item.getPOIPoint());
 		    		mMapView.bringMarkerToFront(tMapMarkerItem);
 		    				 
-		    		/*
-		    		TMapMarkerItem2 tMapMarkerItem2 = new TMapMarkerItem2();
-		    		//tMapMarkerItem2.latitude = item.getPOIPoint().getLatitude();
-		    		//tMapMarkerItem2.longitude = item.getPOIPoint().getLongitude();
-		    		//tMapMarkerItem2.setTMapPoint(markerPoint);
-		    		tMapMarkerItem2.setTMapPoint(item.getPOIPoint());
-		    		
-		    		tMapMarkerItem2.setID(item.getPOIID());
-		    		tMapMarkerItem2.setPosition(1, 1);
-		    		
-		    		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pin_r_s_simple);
-		    		tMapMarkerItem2.setIcon(bitmap);
-		    		*/
 		    		
 		    		//mMapView.addTMapPOIItem(poiItem);
 		    		
@@ -671,15 +464,17 @@ public class MainActivity extends Activity {
 		    		//mMapView.setZoomLevel(14);
 		    		
 		    		//TMapInfo info = mMapView.getDisplayTMapInfo();
-		    		} // for
-		    		TMapInfo info = mMapView.getDisplayTMapInfo(point);
-			    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
-			    	mMapView.setZoomLevel(info.getTMapZoomLevel());
-		    		} 
-		 	    });
-		    	
-		    }
 
+				    	
+		    		} // for
+		    	    }	    				    	   
+		    	});	
+		    	
+		    	//list.setAdapter(new ArrayAdapter(dia.getContext(),android.R.layout.simple_list_item_1,al));
+	    		 
+	    		 dia.dismiss();
+	    		 dia.show();
+		    }	    				    
 		});
 	
 		
@@ -691,7 +486,15 @@ public class MainActivity extends Activity {
 		    				//mMapView.setZoomLevel(16);
 		    				//mMapView.setCenterPoint(lonKau, latKau);
 		    				
-		    				
+		    				if(POIItem.isEmpty()==false)
+		    				{
+		    					for(int i=0; i<POIItem.size(); i++)
+		    					{
+		    						TMapPOIItem item = POIItem.get(i);
+		    						mMapView.removeMarkerItem(item.getPOIID());
+		    					}
+		    					POIItem.clear();
+		    				}
 		    				dia.show();
 		    				//dia.getWindow().setSoftInputMode(
 		    				//		WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
@@ -705,8 +508,6 @@ public class MainActivity extends Activity {
 		findViewById(R.id.button4).setOnClickListener(		
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
-		    				
-		    				/*
 		    				mMapView.setIconVisibility(false);
 		    				mMapView.setZoomLevel(12);
 		    				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
@@ -717,65 +518,10 @@ public class MainActivity extends Activity {
 		    			    		}
 		    			    }
 		    				);
-		    				*/
-		    				
-		    				Thread thread = new Thread() {
-		                        @Override
-		                        public void run() {
-		                            HttpClient httpClient = new DefaultHttpClient();
-
-
-		                            //String urlString = "https://apis.skplanetx.com/tmap/routes/bicycle?callback=&bizAppId=&version=1";
-		                            String urlString = "https://apis.skplanetx.com/tmap/routes/bicycle?callback=&bizAppId=&version=1&format=json&appKey=e2a7df79-5bc7-3f7f-8bca-2d335a0526e7";
-		                            // &format={xml 또는 json}
-		                            
-		                            try {
-		                                URI url = new URI(urlString);
-
-		                                HttpPost httpPost = new HttpPost();
-		                                httpPost.setURI(url);
-
-		                                List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>();
-		                                nameValuePairs.add(new BasicNameValuePair("startX", Double.toString(126.9786599)));
-		                                nameValuePairs.add(new BasicNameValuePair("startY", Double.toString(37.5657321)));
-		                                
-		                                nameValuePairs.add(new BasicNameValuePair("endX", Double.toString(126.9516781)));
-		                                nameValuePairs.add(new BasicNameValuePair("endY", Double.toString(37.5426981)));
-		                                
-		                                nameValuePairs.add(new BasicNameValuePair("reqCoordType", "WGS84GEO"));
-		                                nameValuePairs.add(new BasicNameValuePair("resCoordType", "WGS84GEO"));
-		                                
-		                                nameValuePairs.add(new BasicNameValuePair("startName", "서울시청"));
-		                                nameValuePairs.add(new BasicNameValuePair("endName", "공덕역"));
-		                                
-		                                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-
-
-		                                HttpResponse response = httpClient.execute(httpPost);
-		                                String responseString = EntityUtils.toString(response.getEntity(), HTTP.UTF_8);
-
-		                                Log.d(TAG, responseString);
-
-		                            } catch (URISyntaxException e) {
-		                                Log.e(TAG, e.getLocalizedMessage());
-		                                e.printStackTrace();
-		                            } catch (ClientProtocolException e) {
-		                                Log.e(TAG, e.getLocalizedMessage());
-		                                e.printStackTrace();
-		                            } catch (IOException e) {
-		                                Log.e(TAG, e.getLocalizedMessage());
-		                                e.printStackTrace();
-		                            }
-
-		                        }
-		                    };
-
-
-		                    thread.start();
-		    				
+		    				  
 		    				//mMapView.setCenterPoint((startPoint.getLongitude() + endPoint.getLongitude())/2,
 		    				//		(startPoint.getLatitude() + endPoint.getLongitude()/2));
-		    				//mMapView.setCenterPoint((lonCityhall + lonKau)/2, (latCityhall + latKau)/2);
+		    				mMapView.setCenterPoint((lonCityhall + lonKau)/2, (latCityhall + latKau)/2);
 		    				//mMapView.setCenterPoint((lonCityhall + lonSoowon)/2, (latCityhall + latSoowon)/2);
 		    			}
 		    		  
@@ -823,11 +569,22 @@ public class MainActivity extends Activity {
 					}
 				}
 				);
-	//20150512
- 					  }
+	
+/*
+	    //////////////////////////////////////////////////지도보기를 눌리면 이쪽으로 이동
+		findViewById(R.id.map).setOnClickListener(
+				new Button.OnClickListener() {
+	    			public void onClick(View v) {
+
+
+      		    setContentView(R.layout.activity_main);
+	    			 
+
+	    			   
+	    			  }
 	    		  }
 	    		  );
-	//
+	      		*/
 	}
 
 	
@@ -866,9 +623,6 @@ public class MainActivity extends Activity {
         public void onLocationChanged(Location location) {
         	latMe=location.getLatitude();
         	lonMe=location.getLongitude();
-        	
-    		mMapView.setZoomLevel(16); 
-    		mMapView.setCenterPoint(lonMe, latMe);
     		mMapView.setLocationPoint(lonMe, latMe);
     		mMapView.setIconVisibility(true);
 			
@@ -940,6 +694,6 @@ public class MainActivity extends Activity {
         Intent gpsOptionsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivity(gpsOptionsIntent);
     }
-   
+   	
 }
 

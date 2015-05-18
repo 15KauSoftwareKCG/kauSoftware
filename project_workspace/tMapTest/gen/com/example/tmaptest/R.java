@@ -31,31 +31,34 @@ public final class R {
         public static final int pin_r_s_simple=0x7f020006;
     }
     public static final class id {
-        public static final int action_settings=0x7f080012;
+        public static final int action_settings=0x7f080014;
         public static final int button1=0x7f080001;
         public static final int button2=0x7f080002;
         public static final int button3=0x7f080003;
         public static final int button4=0x7f080004;
         public static final int button7=0x7f080005;
-        public static final int cbutton1=0x7f08000f;
-        public static final int delist=0x7f080010;
-        public static final int editText1=0x7f08000e;
+        public static final int cbutton1=0x7f080011;
+        public static final int delist=0x7f080012;
+        public static final int detail=0x7f080007;
+        public static final int editText1=0x7f080010;
         public static final int mainRelativeLayout=0x7f080000;
-        public static final int map=0x7f08000d;
-        public static final int map1=0x7f080011;
-        public static final int pAddress=0x7f080009;
-        public static final int pName=0x7f080007;
-        public static final int pPhone=0x7f080008;
-        public static final int pbutton1=0x7f08000b;
-        public static final int pbutton2=0x7f08000a;
-        public static final int ptext=0x7f080006;
-        public static final int search=0x7f08000c;
+        public static final int map=0x7f08000f;
+        public static final int map1=0x7f080013;
+        public static final int pAddress=0x7f08000b;
+        public static final int pName=0x7f080009;
+        public static final int pPhone=0x7f08000a;
+        public static final int pbutton1=0x7f08000d;
+        public static final int pbutton2=0x7f08000c;
+        public static final int poiName=0x7f080006;
+        public static final int ptext=0x7f080008;
+        public static final int search=0x7f08000e;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int marker_popup=0x7f030001;
-        public static final int menu=0x7f030002;
-        public static final int set_endpoint=0x7f030003;
+        public static final int list_detail=0x7f030001;
+        public static final int marker_popup=0x7f030002;
+        public static final int menu=0x7f030003;
+        public static final int set_endpoint=0x7f030004;
     }
     public static final class menu {
         public static final int main=0x7f070000;
