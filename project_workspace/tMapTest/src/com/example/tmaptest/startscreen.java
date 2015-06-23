@@ -8,12 +8,14 @@ import android.widget.Button;
 
 public class startscreen extends Activity {
 
-
+	public static Activity startActivity;
+	
 	protected void onCreate(Bundle savedInstanceState)
 	{
 	
 		super.onCreate(savedInstanceState);
-
+		startActivity = startscreen.this;
+		
 	    setContentView(R.layout.menu);
 	    
 	    

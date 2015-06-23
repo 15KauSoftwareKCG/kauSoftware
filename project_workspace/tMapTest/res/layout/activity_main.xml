@@ -8,6 +8,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.tmaptest.MainActivity" >
 
+    
      <RelativeLayout
          android:id="@+id/mainRelativeLayout"
          android:layout_width="fill_parent"
@@ -16,9 +17,13 @@
          android:layout_weight="1"
 		 android:background="@android:color/white"
          android:paddingTop="1dip" >
- 
-     </RelativeLayout>
-
+	 </RelativeLayout>
+	<ImageView
+      android:id="@+id/img"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:src="@drawable/non" /> 
+     
      <Button
          android:id="@+id/button1"
          android:layout_width="wrap_content"

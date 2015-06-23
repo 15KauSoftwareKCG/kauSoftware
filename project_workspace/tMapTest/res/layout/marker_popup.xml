@@ -35,23 +35,32 @@
         android:text="주소"
         android:layout_below="@+id/pPhone" >
 	</TextView>
-    
-    <Button
-        android:id="@+id/pbutton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/ptext"
-        android:layout_marginTop="90dp"
-        android:layout_toRightOf="@+id/pbutton1"
-        android:text="닫기" />
 
-    <Button
-        android:id="@+id/pbutton1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/pbutton2"
-        android:layout_alignBottom="@+id/pbutton2"
-        android:layout_alignParentLeft="true"
-        android:text="길찾기" />
+    	<Button
+    	    android:id="@+id/pbutton3"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_alignBaseline="@+id/pbutton1"
+    	    android:layout_alignBottom="@+id/pbutton1"
+    	    android:layout_alignParentLeft="true"
+    	    android:text="출발지" />
+
+    	<Button
+    	    android:id="@+id/pbutton1"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_below="@+id/pAddress"
+    	    android:layout_marginTop="30dp"
+    	    android:layout_toRightOf="@+id/pbutton3"
+    	    android:text="길찾기" />
+
+    	<Button
+    	    android:id="@+id/pbutton2"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_alignBaseline="@+id/pbutton1"
+    	    android:layout_alignBottom="@+id/pbutton1"
+    	    android:layout_toRightOf="@+id/pbutton1"
+    	    android:text="닫기" />
 
 </RelativeLayout>
