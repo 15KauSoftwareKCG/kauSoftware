@@ -611,24 +611,6 @@ public class MainActivity extends Activity {
 		findViewById(R.id.button4).setOnClickListener(		
 				new Button.OnClickListener() {
 		    			public void onClick(View v) {
-		    				/*
-		    				mMapView.setIconVisibility(false);
-		    				mMapView.setZoomLevel(12);
-		    				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
-		    			    		new FindPathDataListenerCallback() {
-		    			    		public void onFindPathData(TMapPolyLine polyLine) {
-		    			    			polyLine.setLineColor(Color.BLUE);
-		    			    			mMapView.addTMapPath(polyLine);
-		    			    		}
-		    			    }
-		    				);
-		    				  
-		    				//mMapView.setCenterPoint((startPoint.getLongitude() + endPoint.getLongitude())/2,
-		    				//		(startPoint.getLatitude() + endPoint.getLongitude()/2));
-		    				mMapView.setCenterPoint((lonCityhall + lonKau)/2, (latCityhall + latKau)/2);
-		    				//mMapView.setCenterPoint((lonCityhall + lonSoowon)/2, (latCityhall + latSoowon)/2);
-		    				*/
-		    				
 		    				// 이전 마커 지우기
 		    				if(POIItem.isEmpty()==false)
 		    				{
@@ -806,7 +788,7 @@ public class MainActivity extends Activity {
     			//saveRoutePoint.get(routeIndex).getLatitude();
     			tempDistance = distance(latMe, lonMe,
     					saveRoutePoint.get(routeIndex).getLatitude(), saveRoutePoint.get(routeIndex).getLongitude());
-    			if(tempDistance<=3)
+    			if(tempDistance<=10)
     			{
     				routeIndex++;
     			}
@@ -814,6 +796,8 @@ public class MainActivity extends Activity {
     			int needTurn = saveRouteTurn.get(routeIndex);
     			
     			final ImageView imgs=(ImageView)findViewById(R.id.img);
+    			if(distance(latMe, lonMe,
+    					saveRoutePoint.get(routeIndex-1).getLatitude(), saveRoutePoint.get(routeIndex-1).getLongitude())<=10)
     			  switch(needTurn)
     			  {
     			  	case 11:
@@ -841,6 +825,9 @@ public class MainActivity extends Activity {
     			  	
     			  	
     			  } 
+    			else
+    				imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
+			  	
     			/*
     			ArrayList<TMapPoint> preRoutePoint = new ArrayList<TMapPoint>();
     			ArrayList<Integer> preRouteTurn = new ArrayList<Integer>();
