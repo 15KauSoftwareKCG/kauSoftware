@@ -592,8 +592,8 @@ public class MainActivity extends Activity {
 	                      mMapView.setIconVisibility(false);
 	                      //mMapView.setZoomLevel(16);
 	                      //mMapView.setCenterPoint(lonKau, latKau);
-	                      final ImageView imgs=(ImageView)findViewById(R.id.img);
-	                      imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.non));
+	                      //final ImageView imgs=(ImageView)findViewById(R.id.img);
+	                      //imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.non));
 	                      
 	                      startPoint.setLatitude(latMe);
 	                      startPoint.setLongitude(lonMe);
