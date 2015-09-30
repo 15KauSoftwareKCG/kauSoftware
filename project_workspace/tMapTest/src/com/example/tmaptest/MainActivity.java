@@ -129,6 +129,7 @@ public class MainActivity extends Activity {
 	double latTemp = 37.564964;
 	double lonTemp = 126.977984;
 	
+	int count=0;
 	
 	String textEndPoint = "";
 	
@@ -154,7 +155,7 @@ public class MainActivity extends Activity {
     
 	startscreen startActivity = (startscreen)startscreen.startActivity;
 	boolean navigationMode = false;
-	int routeIndex = 1;
+	int routeIndex = 0;
 	TMapOverlayItem tMapOverlayItem= new TMapOverlayItem();
 	
 	private final Handler mHandler = new Handler() {
@@ -789,30 +790,54 @@ public class MainActivity extends Activity {
     		if(navigationMode)
     		{
     			//double saveDistance=40000;
-    			double tempDistance=0;
-
-    			while(saveRouteTurn.get(routeIndex)==11){
-    				routeIndex++;
-    			}
-
-    			//saveRoutePoint.get(routeIndex).getLatitude();
-    			tempDistance = distance(latMe, lonMe,
-    					saveRoutePoint.get(routeIndex).getLatitude(), saveRoutePoint.get(routeIndex+1).getLongitude());
+    			double nextDistance=0;
+    			double priorDistance=0;
+                short radian=0;
     			
+                double nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+    			double nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+    			double priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+    			double priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+    			double priorlatMe=-1 ,priorlonMe=-1;
+    			
+    			int needTurn = saveRouteTurn.get(routeIndex);
+    			
+    			
+                //saveRoutePoint.get(routeIndex).getLatitude();
+    			nextDistance = distance(latMe, lonMe,
+    					nextLat,nextLon );
+    			priorDistance = distance(latMe, lonMe,
+    	    					priorLat,priorLon );
+    	    			
+    			radian = bearingP1toP2(priorLat,priorLon,
+    					nextLat, nextLon);
 
+    			latMe=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+                lonMe=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
 
-    			if(tempDistance<=10.0)
+                if(routeIndex==0)
+    			{
+    				priorlatMe=latMe;
+    				priorlonMe=lonMe;
+    			}
+                else if(radian==bearingP1toP2(priorlatMe,priorlonMe,
+    					latMe, lonMe)){
+                	count=0;
+                }
+                else if(count==10) needTurn = 201;
+                else count++;
+                
+    			if(nextDistance<=10.0)
     			{
     				routeIndex++;
     			}
     			
-    			int needTurn = saveRouteTurn.get(routeIndex);
     			
     			TextView imgs=(TextView)findViewById(R.id.img);
     			TextView Distance=(TextView)findViewById(R.id.distance);
     			
     			imgs.setText(needTurn+"");
-    			Distance.setText(tempDistance+"");
+    			Distance.setText(nextDistance+"");
     			
     			if(needTurn==201){
     				mLocMgr.removeUpdates(mLocListener);
@@ -822,7 +847,9 @@ public class MainActivity extends Activity {
 						
 		        	toast.show();
 					islocation=false;
-					routeIndex=1;
+					routeIndex=0;
+					priorlatMe=-1;
+					priorlonMe=-1;
 					
     			}
     			
