@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.LogManager;
 
 import javax.xml.parsers.FactoryConfigurationError;
@@ -129,7 +131,7 @@ public class MainActivity extends Activity {
 	double latTemp = 37.564964;
 	double lonTemp = 126.977984;
 	
-	int count=0;
+	int dcount=0,rcount=0;
 	
 	String textEndPoint = "";
 	
@@ -792,53 +794,107 @@ public class MainActivity extends Activity {
     			//double saveDistance=40000;
     			double nextDistance=0;
     			double priorDistance=0;
-                short radian=0;
+    			double lineDistance=0;
+    			double errDistance=0;
+    			short radian=0;
     			
                 double nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
     			double nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
     			double priorLat=saveRoutePoint.get(routeIndex).getLatitude();
     			double priorLon=saveRoutePoint.get(routeIndex).getLongitude();
     			double priorlatMe=-1 ,priorlonMe=-1;
-    			
+    			double correctionlat;
+    			double correctionlon;
     			int needTurn = saveRouteTurn.get(routeIndex);
+
+    			TextView imgs=(TextView)findViewById(R.id.img);
+    			 
     			
-    			
-                //saveRoutePoint.get(routeIndex).getLatitude();
-    			nextDistance = distance(latMe, lonMe,
-    					nextLat,nextLon );
-    			priorDistance = distance(latMe, lonMe,
-    	    					priorLat,priorLon );
-    	    			
+    			//진행 해야하는 방향을 구한다.
     			radian = bearingP1toP2(priorLat,priorLon,
     					nextLat, nextLon);
-
-    			latMe=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
-                lonMe=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
-
-                if(routeIndex==0)
+    			
+                //saveRoutePoint.get(routeIndex).getLatitude();
+    			
+    			
+    			
+     	    	if(routeIndex==0)
     			{
     				priorlatMe=latMe;
     				priorlonMe=lonMe;
     			}
-                else if(radian==bearingP1toP2(priorlatMe,priorlonMe,
-    					latMe, lonMe)){
-                	count=0;
-                }
-                else if(count==10) needTurn = 201;
-                else count++;
-                
-    			if(nextDistance<=10.0)
-    			{
-    				routeIndex++;
+     	    	
+     	    	
+    			
+     	    	
+    			nextDistance = distance(latMe, lonMe,
+    					nextLat,nextLon );
+    			priorDistance = distance(latMe, lonMe,
+    	    					priorLat,priorLon );
+    			lineDistance = distance(priorLat, priorLon,nextLat,nextLon);
+
+    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+     	    	correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+     	    	errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+    	    	
+    			
+    			
+    			
+     	    	if(errDistance>10.0){
+     	    		
+     	    		while(errDistance>10.0&&saveRouteTurn.get(routeIndex)!=201){
+     	    			
+     	    			
+     	    			routeIndex++;
+        				
+     	    			nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+     	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+     	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+     	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+     	    		
+     	    			nextDistance = distance(latMe, lonMe,
+     	    					nextLat,nextLon );
+     	    			priorDistance = distance(latMe, lonMe,
+     	    	    					priorLat,priorLon );
+     	   
+     	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+     	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+     	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+     	    		}
+        			
+     	    		if(needTurn==11){
+        				imgs.setText(11+"");
+        			}
     			}
+     	    	else{
+        			latMe=correctionlat;
+                    lonMe=correctionlon;
+    	    	}
     			
     			
-    			TextView imgs=(TextView)findViewById(R.id.img);
+    			
+    			
+            /*    if(radian==bearingP1toP2(priorlatMe,priorlonMe,
+    					latMe, lonMe)){
+                	rcount=0;
+                }
+                else if(rcount==3) needTurn = 201;
+                else rcount++;
+              */  
+    			
+                
     			TextView Distance=(TextView)findViewById(R.id.distance);
+
+				
+    			Distance.setText(errDistance+"");
     			
-    			imgs.setText(needTurn+"");
-    			Distance.setText(nextDistance+"");
     			
+    			//30미터 이전에 회전값을 출력해준다.               
+    			if(nextDistance<=30.0)
+    			{
+    				if(saveRouteTurn.get(routeIndex+1)!=11)
+        	 		   imgs.setText(saveRouteTurn.get(routeIndex+1)+"");
+    			}
     			if(needTurn==201){
     				mLocMgr.removeUpdates(mLocListener);
 					Toast toast;

@@ -813,31 +813,109 @@ public class MainActivity extends Activity {
     		if(navigationMode)
     		{
     			//double saveDistance=40000;
-    			double tempDistance=0;
-
-    			while(saveRouteTurn.get(routeIndex)==11){
-    				routeIndex++;
-    			}
-
-    			//saveRoutePoint.get(routeIndex).getLatitude();
-    			tempDistance = distance(latMe, lonMe,
-    					saveRoutePoint.get(routeIndex).getLatitude(), saveRoutePoint.get(routeIndex+1).getLongitude());
+    			double nextDistance=0;
+    			double priorDistance=0;
+    			double lineDistance=0;
+    			double errDistance=0;
+    			short radian=0;
     			
-
-
-    			if(tempDistance<=10.0)
-    			{
-    				routeIndex++;
-    			}
-    			
+                double nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+    			double nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+    			double priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+    			double priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+    			double priorlatMe=-1 ,priorlonMe=-1;
+    			double correctionlat;
+    			double correctionlon;
     			int needTurn = saveRouteTurn.get(routeIndex);
-    			
+
     			TextView imgs=(TextView)findViewById(R.id.img);
+    			 
+    			
+    			//진행 해야하는 방향을 구한다.
+    			radian = bearingP1toP2(priorLat,priorLon,
+    					nextLat, nextLon);
+    			
+                //saveRoutePoint.get(routeIndex).getLatitude();
+    			
+    			
+    			
+     	    	if(routeIndex==0)
+    			{
+    				priorlatMe=latMe;
+    				priorlonMe=lonMe;
+    			}
+     	    	
+     	    	
+    			
+     	    	
+    			nextDistance = distance(latMe, lonMe,
+    					nextLat,nextLon );
+    			priorDistance = distance(latMe, lonMe,
+    	    					priorLat,priorLon );
+    			lineDistance = distance(priorLat, priorLon,nextLat,nextLon);
+
+    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+     	    	correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+     	    	errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+    	    	
+    			
+    			
+    			
+     	    	if(errDistance>10.0){
+     	    		
+     	    		while(errDistance>10.0&&saveRouteTurn.get(routeIndex)!=201){
+     	    			
+     	    			
+     	    			routeIndex++;
+        				
+     	    			nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+     	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+     	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+     	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+     	    		
+     	    			nextDistance = distance(latMe, lonMe,
+     	    					nextLat,nextLon );
+     	    			priorDistance = distance(latMe, lonMe,
+     	    	    					priorLat,priorLon );
+     	   
+     	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+     	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+     	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+     	    		}
+        			
+     	    		if(needTurn==11){
+        				imgs.setText(11+"");
+        			}
+    			}
+     	    	else{
+        			latMe=correctionlat;
+                    lonMe=correctionlon;
+    	    	}
+    			
+    			
+    			
+    			
+            /*    if(radian==bearingP1toP2(priorlatMe,priorlonMe,
+    					latMe, lonMe)){
+                	rcount=0;
+                }
+                else if(rcount==3) needTurn = 201;
+                else rcount++;
+              */  
+    			
+                
     			TextView Distance=(TextView)findViewById(R.id.distance);
+
+				
+    			Distance.setText(errDistance+"");
     			
-    			imgs.setText(needTurn+"");
-    			Distance.setText(tempDistance+"");
     			
+    			//30미터 이전에 회전값을 출력해준다.               
+    			if(nextDistance<=30.0)
+    			{
+    				if(saveRouteTurn.get(routeIndex+1)!=11)
+        	 		   imgs.setText(saveRouteTurn.get(routeIndex+1)+"");
+    			}
     			if(needTurn==201){
     				mLocMgr.removeUpdates(mLocListener);
 					Toast toast;
@@ -846,10 +924,13 @@ public class MainActivity extends Activity {
 						
 		        	toast.show();
 					islocation=false;
-					routeIndex=1;
+					routeIndex=0;
+					priorlatMe=-1;
+					priorlonMe=-1;
 					
     			}
     			
+
     			/*
     			if(distance(latMe, lonMe,
     					saveRoutePoint.get(routeIndex-1).getLatitude(), saveRoutePoint.get(routeIndex-1).getLongitude())<=10)
