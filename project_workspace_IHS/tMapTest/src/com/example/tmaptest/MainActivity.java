@@ -368,6 +368,7 @@ public class MainActivity extends Activity {
 			    	
 			    	MarkerPoint.setLatitude(tMapMarkerItem.latitude);
 					MarkerPoint.setLongitude(tMapMarkerItem.longitude);
+					
 			    	popMarker.show();
 	    		//}
 	    	}
