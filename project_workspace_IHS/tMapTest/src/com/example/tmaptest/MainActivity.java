@@ -871,7 +871,7 @@ public class MainActivity extends Activity {
     			
     			
     			
-     	    	if(errDistance>10.0){
+     	    	if(errDistance>15.0){
      	    		NaviState = 0 ;
      	    		while(errDistance>10.0&&saveRouteTurn.get(routeIndex)!=201){
      	    			
@@ -892,7 +892,7 @@ public class MainActivity extends Activity {
      	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
      	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
      	    		}
-        			if(errDistance<=10)
+        			if(errDistance<=15)
         				NaviState = 1;
         			else
         			{
@@ -907,17 +907,17 @@ public class MainActivity extends Activity {
         				 MainActivity.mMapView.addTMapPath(polyLine);
         				 }
         				 }
-        				 );
+        				);
 
         				MainActivity.getJsonData(startPoint, endPoint);
 
-        				ArrayList point = new ArrayList();
-        				 point.add(startPoint);
+        				ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
+				    	 point.add(startPoint);
         				 point.add(endPoint);
         				 TMapInfo info = MainActivity.mMapView.getDisplayTMapInfo(point);
         				 MainActivity.mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
         				 MainActivity.mMapView.setZoomLevel(info.getTMapZoomLevel()); 
-        				 dia.dismiss(); 
+        				// dia.dismiss(); 
         				
         			}
      	    		if(needTurn==11){
