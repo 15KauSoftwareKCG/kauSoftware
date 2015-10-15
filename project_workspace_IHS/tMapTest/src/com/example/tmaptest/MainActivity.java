@@ -156,9 +156,18 @@ public class MainActivity extends Activity {
     
 	startscreen startActivity = (startscreen)startscreen.startActivity;
 	boolean navigationMode = false;
+	int NaviState=0;
 	int routeIndex = 1;
 	TMapOverlayItem tMapOverlayItem= new TMapOverlayItem();
 	
+	final TMapPoint startPoint = new TMapPoint(latCityhall, lonCityhall);
+    final TMapPoint MarkerPoint = new TMapPoint(latCityhall, lonCityhall);
+    final TMapPoint endPoint = new TMapPoint(latKau, lonKau);
+	
+    final Dialog dia = new Dialog(MainActivity.this);
+	 
+    final TMapData tmapdata = new TMapData();
+
 	private final Handler mHandler = new Handler() {
 		  
 		@Override
@@ -213,9 +222,9 @@ public class MainActivity extends Activity {
 	    gps.setMinDistance(5);
 	    gps.setProvider(TMapGpsManager.GPS_PROVIDER);
 	    
-	    final Dialog dia = new Dialog(MainActivity.this);
+//	    final Dialog dia = new Dialog(MainActivity.this);
 	 
-	    final TMapData tmapdata = new TMapData();
+//	    final TMapData tmapdata = new TMapData();
 	     
 	    // *setCenterPoint(lon, lat)
 	    mMapView.setCenterPoint(lon, lat);
@@ -226,9 +235,9 @@ public class MainActivity extends Activity {
 	    //TMapPoint tpoint = mMapView.getLocationPoint();
 	    
 	    // *TmapPoint(lat, lon)
-	    final TMapPoint startPoint = new TMapPoint(latCityhall, lonCityhall);
-	    final TMapPoint MarkerPoint = new TMapPoint(latCityhall, lonCityhall);
-	    final TMapPoint endPoint = new TMapPoint(latKau, lonKau);
+//	    final TMapPoint startPoint = new TMapPoint(latCityhall, lonCityhall);
+//	    final TMapPoint MarkerPoint = new TMapPoint(latCityhall, lonCityhall);
+//	    final TMapPoint endPoint = new TMapPoint(latKau, lonKau);
 	    
 	    final TMapPoint startTemp = new TMapPoint(latTemp, lonTemp);
 	    
@@ -812,6 +821,7 @@ public class MainActivity extends Activity {
     		
     		if(navigationMode)
     		{
+    			NaviState=1;
     			//double saveDistance=40000;
     			double nextDistance=0;
     			double priorDistance=0;
@@ -862,7 +872,7 @@ public class MainActivity extends Activity {
     			
     			
      	    	if(errDistance>10.0){
-     	    		
+     	    		NaviState = 0 ;
      	    		while(errDistance>10.0&&saveRouteTurn.get(routeIndex)!=201){
      	    			
      	    			
@@ -882,7 +892,34 @@ public class MainActivity extends Activity {
      	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
      	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
      	    		}
-        			
+        			if(errDistance<=10)
+        				NaviState = 1;
+        			else
+        			{
+        				//경로 재탐색
+        				startPoint.setLatitude(latMe);
+        				startPoint.setLongitude(lonMe);
+
+        				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
+        				 new FindPathDataListenerCallback() {
+        				 public void onFindPathData(TMapPolyLine polyLine) {
+        				 polyLine.setLineColor(Color.GREEN);
+        				 MainActivity.mMapView.addTMapPath(polyLine);
+        				 }
+        				 }
+        				 );
+
+        				MainActivity.getJsonData(startPoint, endPoint);
+
+        				ArrayList point = new ArrayList();
+        				 point.add(startPoint);
+        				 point.add(endPoint);
+        				 TMapInfo info = MainActivity.mMapView.getDisplayTMapInfo(point);
+        				 MainActivity.mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
+        				 MainActivity.mMapView.setZoomLevel(info.getTMapZoomLevel()); 
+        				 dia.dismiss(); 
+        				
+        			}
      	    		if(needTurn==11){
         				imgs.setText(11+"");
         			}
