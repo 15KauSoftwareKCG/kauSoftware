@@ -837,13 +837,12 @@ public class MainActivity extends Activity {
      	    	correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
      	    	errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
     	    	
-    			
+
     			
     			
      	    	if(errDistance>10.0){
      	    		
      	    		while(errDistance>10.0&&saveRouteTurn.get(routeIndex)!=201){
-     	    			
      	    			
      	    			routeIndex++;
         				
@@ -861,16 +860,16 @@ public class MainActivity extends Activity {
      	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
      	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
      	    		}
+
+ 	    			needTurn=saveRouteTurn.get(routeIndex);
+ 	    			
         			
      	    		if(needTurn==11){
         				imgs.setText(11+"");
         			}
     			}
-     	    	else{
-        			latMe=correctionlat;
-                    lonMe=correctionlon;
-    	    	}
-    			
+
+        		mMapView.setLocationPoint(correctionlon, correctionlat);
     			
     			
     			
