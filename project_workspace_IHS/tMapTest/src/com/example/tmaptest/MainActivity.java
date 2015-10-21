@@ -892,7 +892,15 @@ public class MainActivity extends Activity {
      	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
      	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
      	    		}
-        			if(errDistance<=15)
+     	    		
+     	    		needTurn=saveRouteTurn.get(routeIndex);
+     	    		if(needTurn==11){
+        				imgs.setText(11+"");
+        			}
+    			}
+     	    	else{
+        		    
+                    if(errDistance<=15)
         				NaviState = 1;
         			else
         			{
@@ -920,16 +928,11 @@ public class MainActivity extends Activity {
         				// dia.dismiss(); 
         				
         			}
-     	    		if(needTurn==11){
-        				imgs.setText(11+"");
-        			}
-    			}
-     	    	else{
-        			latMe=correctionlat;
-                    lonMe=correctionlon;
+                    
+                    
     	    	}
     			
-    			
+    			mMapView.setLocationPoint(correctionlon,correctionlat);
     			
     			
             /*    if(radian==bearingP1toP2(priorlatMe,priorlonMe,
