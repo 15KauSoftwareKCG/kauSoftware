@@ -798,10 +798,10 @@ public class MainActivity extends Activity {
     			double errDistance=0;
     			short radian=0;
     			
-                double nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
-    			double nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
-    			double priorLat=saveRoutePoint.get(routeIndex).getLatitude();
-    			double priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+                double nextLat;
+    			double nextLon;
+    			double priorLat;
+    			double priorLon;
     			double priorlatMe=-1 ,priorlonMe=-1;
     			double correctionlat;
     			double correctionlon;
@@ -810,171 +810,194 @@ public class MainActivity extends Activity {
     			TextView imgs=(TextView)findViewById(R.id.img);
     			 
     			
-    			//진행 해야하는 방향을 구한다.
-    			radian = bearingP1toP2(priorLat,priorLon,
-    					nextLat, nextLon);
     			
                 //saveRoutePoint.get(routeIndex).getLatitude();
     			
     			
-    			
+    			//처음이라면 다음지점까지 도착할 때까지 기다린다
      	    	if(routeIndex==0)
     			{
     				priorlatMe=latMe;
     				priorlonMe=lonMe;
-    			}
-     	    	
-     	    	
-    			
-     	    	
-    			nextDistance = distance(latMe, lonMe,
-    					nextLat,nextLon );
-    			priorDistance = distance(latMe, lonMe,
-    	    					priorLat,priorLon );
-    			lineDistance = distance(priorLat, priorLon,nextLat,nextLon);
-
-    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
-     	    	correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
-     	    	errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
-    	    	
-
-    			
-    			
-     	    	if(errDistance>10.0){
-     	    		
-     	    		while(errDistance>10.0&&saveRouteTurn.get(routeIndex)!=201){
-     	    			
-     	    			routeIndex++;
-        				
-     	    			nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
-     	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
-     	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
-     	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
-     	    		
-     	    			nextDistance = distance(latMe, lonMe,
-     	    					nextLat,nextLon );
-     	    			priorDistance = distance(latMe, lonMe,
-     	    	    					priorLat,priorLon );
-     	   
-     	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
-     	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
-     	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
-     	    		}
-
- 	    			needTurn=saveRouteTurn.get(routeIndex);
+    				
+    				//다음 지점까지의 거리
+    				nextLat=saveRoutePoint.get(routeIndex+2).getLatitude();
+ 	    			nextLon=saveRoutePoint.get(routeIndex+2).getLongitude();
+ 	    			priorLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+ 	    			priorLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+ 	    			nextDistance = distance(latMe, lonMe,
+ 	    					nextLat,nextLon );
+ 	    			priorDistance = distance(latMe, lonMe,
+ 	    	    					priorLat,priorLon );
+ 	   
+ 	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+ 	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+ 	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+ 	    		
+ 	    			if(errDistance<15) routeIndex++;
  	    			
-        			
-     	    		if(needTurn==11){
-        				imgs.setText(11+"");
-        			}
     			}
-
-        		mMapView.setLocationPoint(correctionlon, correctionlat);
-    			
-    			
-    			
-            /*    if(radian==bearingP1toP2(priorlatMe,priorlonMe,
-    					latMe, lonMe)){
-                	rcount=0;
-                }
-                else if(rcount==3) needTurn = 201;
-                else rcount++;
-              */  
-    			
-                
-    			TextView Distance=(TextView)findViewById(R.id.distance);
-
-				
-    			Distance.setText(errDistance+"");
-    			
-    			
-    			//30미터 이전에 회전값을 출력해준다.               
-    			if(nextDistance<=30.0)
-    			{
-    				if(saveRouteTurn.get(routeIndex+1)!=11)
-        	 		   imgs.setText(saveRouteTurn.get(routeIndex+1)+"");
-    			}
-    			if(needTurn==201){
-    				mLocMgr.removeUpdates(mLocListener);
-					Toast toast;
-		        	toast = Toast.makeText(MainActivity.this,
-							"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
-						
-		        	toast.show();
-					islocation=false;
-					routeIndex=0;
-					priorlatMe=-1;
-					priorlonMe=-1;
+    
+     	    	
+     	    	else{
+     	    	
+     	    		nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+ 	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+ 	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+ 	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+ 	    			
+	    			nextDistance = distance(latMe, lonMe,
+	    					nextLat,nextLon );
+	    			priorDistance = distance(latMe, lonMe,
+	    	    					priorLat,priorLon );
+	    			lineDistance = distance(priorLat, priorLon,nextLat,nextLon);
+	
+	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+	     	    	correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+	     	    	errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+	    	    	
+	     	    	//진행 해야하는 방향을 구한다.
+	    			radian = bearingP1toP2(priorLat,priorLon,
+	    					nextLat, nextLon);
+	    			
+	    			
+	    			
+	     	    	if(errDistance>15.0){
+	     	    		
+	     	    		while(errDistance>15.0&&saveRouteTurn.get(routeIndex)!=201){
+	     	    			
+	     	    			routeIndex++;
+	        				
+	     	    			nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+	     	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+	     	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+	     	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+	     	    		
+	     	    			nextDistance = distance(latMe, lonMe,
+	     	    					nextLat,nextLon );
+	     	    			priorDistance = distance(latMe, lonMe,
+	     	    	    					priorLat,priorLon );
+	     	   
+	     	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+	     	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+	     	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
+	     	    		}
+	
+	 	    			needTurn=saveRouteTurn.get(routeIndex);
+	 	    			
+	        			
+	     	    		if(needTurn==11){
+	        				imgs.setText(11+"");
+	        			}
+	    			}
+	
+	        		mMapView.setLocationPoint(correctionlon, correctionlat);
+	    			
+	    			
+	    			
+	            /*    if(radian==bearingP1toP2(priorlatMe,priorlonMe,
+	    					latMe, lonMe)){
+	                	rcount=0;
+	                }
+	                else if(rcount==3) needTurn = 201;
+	                else rcount++;
+	              */  
+	    			
+	                
+	    			TextView Distance=(TextView)findViewById(R.id.distance);
+	
 					
-    			}
-    			
-    			/*
-    			if(distance(latMe, lonMe,
-    					saveRoutePoint.get(routeIndex-1).getLatitude(), saveRoutePoint.get(routeIndex-1).getLongitude())<=10)
-    			  switch(needTurn)
-    			  {
-    			  	case 11:
-    			  	{
-    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
-    			  		break;
-    			  	} 
-    			  	case 12:
-    			  	{
-    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_left));
-    			  		break;
-      			    } 
-    			  	case 13:
-    			  	{
-    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_right));
-    			  		break;
-      			    }
-    			  	case 201:
-    			  	{
-    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_end));
-    			  		navigationMode = false;
-    			  		saveDistance=40000;
-    			  		routeIndex=1;
-      			    }
-    			  	
-    			  	
-    			  } 
-    			else
-    				imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
-			  	*/
-    			/*
-    			ArrayList<TMapPoint> preRoutePoint = new ArrayList<TMapPoint>();
-    			ArrayList<Integer> preRouteTurn = new ArrayList<Integer>();
-    			
-    			preRoutePoint = saveRoutePoint;
-    			preRouteTurn = saveRouteTurn;
-    			int check=0;
-    			
-    			TMapPoint moveMe = new TMapPoint(latMe, lonMe);
-    			getJsonData(moveMe, endPoint);
-    			
-    			check = checkRoute(saveRoutePoint, preRoutePoint, saveRouteTurn, preRouteTurn);
-    			
-    			 Toast toastCheckCorrectRoute = Toast.makeText(MainActivity.this,
-    						"check = "+ check, Toast.LENGTH_LONG);
-    			 toastCheckCorrectRoute.show();
-    			 
-    			 if(check==3 || check==2)
-    			 {
-    				 saveRoutePoint = preRoutePoint;
-    				 saveRouteTurn = preRouteTurn;
-    			 }
-    			 else if(check==1)
-    			 {
-    			 
-    				 routeIndex=1;
-    			 }
-    			 else if(check==0)
-    			 {
-    				getJsonData(moveMe, endPoint);
-    				routeIndex=1;
-    			 }
-    			 nextState(saveRouteTurn, check);
-    			 */
+	    			Distance.setText(errDistance+"");
+	    			
+	    			
+	    			//30미터 이전에 회전값을 출력해준다.               
+	    			if(nextDistance<=30.0)
+	    			{
+	    				if(saveRouteTurn.get(routeIndex+1)!=11)
+	        	 		   imgs.setText(saveRouteTurn.get(routeIndex+1)+"");
+	    			}
+	    			if(needTurn==201){
+	    				mLocMgr.removeUpdates(mLocListener);
+						Toast toast;
+			        	toast = Toast.makeText(MainActivity.this,
+								"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
+							
+			        	toast.show();
+						islocation=false;
+						routeIndex=0;
+						priorlatMe=-1;
+						priorlonMe=-1;
+						
+	    			}
+	    			
+	    			/*
+	    			if(distance(latMe, lonMe,
+	    					saveRoutePoint.get(routeIndex-1).getLatitude(), saveRoutePoint.get(routeIndex-1).getLongitude())<=10)
+	    			  switch(needTurn)
+	    			  {
+	    			  	case 11:
+	    			  	{
+	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
+	    			  		break;
+	    			  	} 
+	    			  	case 12:
+	    			  	{
+	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_left));
+	    			  		break;
+	      			    } 
+	    			  	case 13:
+	    			  	{
+	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_right));
+	    			  		break;
+	      			    }
+	    			  	case 201:
+	    			  	{
+	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_end));
+	    			  		navigationMode = false;
+	    			  		saveDistance=40000;
+	    			  		routeIndex=1;
+	      			    }
+	    			  	
+	    			  	
+	    			  } 
+	    			else
+	    				imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
+				  	*/
+	    			/*
+	    			ArrayList<TMapPoint> preRoutePoint = new ArrayList<TMapPoint>();
+	    			ArrayList<Integer> preRouteTurn = new ArrayList<Integer>();
+	    			
+	    			preRoutePoint = saveRoutePoint;
+	    			preRouteTurn = saveRouteTurn;
+	    			int check=0;
+	    			
+	    			TMapPoint moveMe = new TMapPoint(latMe, lonMe);
+	    			getJsonData(moveMe, endPoint);
+	    			
+	    			check = checkRoute(saveRoutePoint, preRoutePoint, saveRouteTurn, preRouteTurn);
+	    			
+	    			 Toast toastCheckCorrectRoute = Toast.makeText(MainActivity.this,
+	    						"check = "+ check, Toast.LENGTH_LONG);
+	    			 toastCheckCorrectRoute.show();
+	    			 
+	    			 if(check==3 || check==2)
+	    			 {
+	    				 saveRoutePoint = preRoutePoint;
+	    				 saveRouteTurn = preRouteTurn;
+	    			 }
+	    			 else if(check==1)
+	    			 {
+	    			 
+	    				 routeIndex=1;
+	    			 }
+	    			 else if(check==0)
+	    			 {
+	    				getJsonData(moveMe, endPoint);
+	    				routeIndex=1;
+	    			 }
+	    			 nextState(saveRouteTurn, check);
+	    			 */
+	    		}
     		}
 			
         }
