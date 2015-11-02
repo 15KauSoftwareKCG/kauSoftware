@@ -1,11 +1,15 @@
 package com.example.tmaptest;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.LogManager;
@@ -26,6 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.xml.sax.SAXException;
+
+import com.example.tmaptest.BluetoothSerialClient;
+import com.example.tmaptest.BluetoothSerialClient.OnBluetoothEnabledListener;
+import com.example.tmaptest.BluetoothSerialClient.OnScanListener;
+import com.example.tmaptest.R;
+import com.example.tmaptest.BluetoothSerialClient.BluetoothStreamingHandler;
 
 import com.skp.Tmap.TMapAddressInfo;
 import com.skp.Tmap.TMapData;
@@ -52,13 +62,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
+import android.graphics.Point;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Criteria;
@@ -72,8 +86,11 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -81,7 +98,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import android.widget.AdapterView.OnItemClickListener;
 
 
 public class MainActivity extends Activity {
@@ -95,10 +112,21 @@ public class MainActivity extends Activity {
 	// Intent request code
     private static final int REQUEST_CONNECT_DEVICE = 1;
     private static final int REQUEST_ENABLE_BT = 2;
+	//블루투스
+    private BluetoothSerialClient mClient;
+    private AlertDialog mDeviceListDialog;
+    private ProgressDialog mLoadingDialog;
+    private TextView mTextView;
+    private ArrayAdapter<String> mDeviceArrayAdapter;
+	private LinkedList<BluetoothDevice> mBluetoothDevices = new LinkedList<BluetoothDevice>();
+	private Menu mMenu;
+	private EditText mEditTextInput;
 	
+    
     //Location location = null;
 	//LocationManager lm = null; 
    
+	
     // 서울 시청 (WGS84) 기본 위치
 	double lat=37.5657321; // 위도
 	double lon=126.9786599; // 경도
@@ -133,6 +161,14 @@ public class MainActivity extends Activity {
 	
 	int dcount=0,rcount=0;
 	
+	// *TmapPoint(lat, lon)
+    final TMapPoint startPoint = new TMapPoint(latCityhall, lonCityhall);
+    final TMapPoint MarkerPoint = new TMapPoint(latCityhall, lonCityhall);
+    final TMapPoint endPoint = new TMapPoint(latKau, lonKau);
+    
+    final TMapPoint startTemp = new TMapPoint(latTemp, lonTemp);
+    final TMapData tmapdata = new TMapData();
+	
 	String textEndPoint = "";
 	
 	TMapPOIItem item = new TMapPOIItem();
@@ -142,6 +178,7 @@ public class MainActivity extends Activity {
 	TMapAddressInfo addressInfoSave = new TMapAddressInfo();
 
 	static final ArrayList<TMapPoint> saveRoutePoint = new ArrayList<TMapPoint>();
+	static final ArrayList<TMapPoint> saveRouteTurnPoint = new ArrayList<TMapPoint>();
 	static final ArrayList<Integer> saveRouteTurn = new ArrayList<Integer>();
 	
 	double saveDistance=40000;
@@ -158,6 +195,7 @@ public class MainActivity extends Activity {
 	startscreen startActivity = (startscreen)startscreen.startActivity;
 	boolean navigationMode = false;
 	int routeIndex = 0;
+	int turnIndex = 0;
 	TMapOverlayItem tMapOverlayItem= new TMapOverlayItem();
 	
 	private final Handler mHandler = new Handler() {
@@ -195,10 +233,23 @@ public class MainActivity extends Activity {
 	 
 	    startActivity.finish();
 	 
+	    //블루투스
+	    mClient = BluetoothSerialClient.getInstance();
+		 
+		 if(mClient == null) {
+			 Toast.makeText(getApplicationContext(), "Cannot use the Bluetooth device.", Toast.LENGTH_SHORT).show();
+			 finish();
+		 } else{
+			 overflowMenuInActionBar();
+			 initProgressDialog();
+			 initDeviceListDialog();
+			// initWidget();
+			 }
+	    
 	    // BluetoothService 클래스 생성
-	    if(btService == null) {
-	    	btService = new BluetoothService(this, mHandler);
-	    }
+	    //if(btService == null) {
+	    //	btService = new BluetoothService(this, mHandler);
+	    //}
 	      
 	    mLocMgr = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
         locProv = mLocMgr.getBestProvider(getCriteria(), true);
@@ -216,7 +267,6 @@ public class MainActivity extends Activity {
 	    
 	    final Dialog dia = new Dialog(MainActivity.this);
 	 
-	    final TMapData tmapdata = new TMapData();
 	     
 	    // *setCenterPoint(lon, lat)
 	    mMapView.setCenterPoint(lon, lat);
@@ -226,12 +276,6 @@ public class MainActivity extends Activity {
 	      	      
 	    //TMapPoint tpoint = mMapView.getLocationPoint();
 	    
-	    // *TmapPoint(lat, lon)
-	    final TMapPoint startPoint = new TMapPoint(latCityhall, lonCityhall);
-	    final TMapPoint MarkerPoint = new TMapPoint(latCityhall, lonCityhall);
-	    final TMapPoint endPoint = new TMapPoint(latKau, lonKau);
-	    
-	    final TMapPoint startTemp = new TMapPoint(latTemp, lonTemp);
 	    
 	    TMapPolyLine polyLine= new TMapPolyLine();
 		
@@ -377,6 +421,8 @@ public class MainActivity extends Activity {
 	    	popStart.setOnClickListener(new Button.OnClickListener(){
 	    		public void onClick(View v) {
 	    			popMarker.dismiss();
+	    			latMe=MarkerPoint.getLatitude();
+	    			lonMe=MarkerPoint.getLongitude();
 	    			startPoint.setLatitude(MarkerPoint.getLatitude());
 	    			startPoint.setLongitude(MarkerPoint.getLongitude());
 	    		}
@@ -469,6 +515,7 @@ public class MainActivity extends Activity {
 	    							"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
 	    						
 	    		        	toast.show();
+	    		        	mLoadingDialog.setMessage("13");
 	    					islocation=false;
 	    				}
 		    			startPoint.setLatitude(latMe);
@@ -745,7 +792,7 @@ public class MainActivity extends Activity {
 	      		*/
 	}
 
-	
+	/*
 	
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -765,7 +812,7 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
-    
+    */
     public void markerClick(TMapMarkerItem markerItem)
     {
     	Toast toastMarkerClick = Toast.makeText(MainActivity.this,
@@ -791,40 +838,33 @@ public class MainActivity extends Activity {
     		
     		if(navigationMode)
     		{
-    			//double saveDistance=40000;
+    			
     			double nextDistance=0;
     			double priorDistance=0;
-    			double lineDistance=0;
     			double errDistance=0;
-    			short radian=0;
-    			
+    			double turnDistance=0;
+    			    			
                 double nextLat;
     			double nextLon;
     			double priorLat;
     			double priorLon;
-    			double priorlatMe=-1 ,priorlonMe=-1;
     			double correctionlat;
     			double correctionlon;
-    			int needTurn = saveRouteTurn.get(routeIndex);
 
     			TextView imgs=(TextView)findViewById(R.id.img);
     			 
     			
     			
-                //saveRoutePoint.get(routeIndex).getLatitude();
-    			
+             	
     			
     			//처음이라면 다음지점까지 도착할 때까지 기다린다
-     	    	if(routeIndex==0)
+     	    	if(turnIndex==0)
     			{
-    				priorlatMe=latMe;
-    				priorlonMe=lonMe;
-    				
     				//다음 지점까지의 거리
-    				nextLat=saveRoutePoint.get(routeIndex+2).getLatitude();
- 	    			nextLon=saveRoutePoint.get(routeIndex+2).getLongitude();
- 	    			priorLat=saveRoutePoint.get(routeIndex+1).getLatitude();
- 	    			priorLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+    				nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+ 	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+ 	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+ 	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
  	    			nextDistance = distance(latMe, lonMe,
  	    					nextLat,nextLon );
  	    			priorDistance = distance(latMe, lonMe,
@@ -834,11 +874,11 @@ public class MainActivity extends Activity {
  	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
  	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
  	    		
- 	    			if(errDistance<15) routeIndex++;
- 	    			
+ 	    			if(errDistance<=15){
+ 	    				turnIndex++;
+ 	    			}
+
     			}
-    
-     	    	
      	    	else{
      	    	
      	    		nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
@@ -850,24 +890,15 @@ public class MainActivity extends Activity {
 	    					nextLat,nextLon );
 	    			priorDistance = distance(latMe, lonMe,
 	    	    					priorLat,priorLon );
-	    			lineDistance = distance(priorLat, priorLon,nextLat,nextLon);
 	
 	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
 	     	    	correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
 	     	    	errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
-	    	    	
-	     	    	//진행 해야하는 방향을 구한다.
-	    			radian = bearingP1toP2(priorLat,priorLon,
-	    					nextLat, nextLon);
-	    			
-	    			
-	    			
-	     	    	if(errDistance>15.0){
-	     	    		
-	     	    		while(errDistance>15.0&&saveRouteTurn.get(routeIndex)!=201){
+	    	    		
+	    	
+	     	    	while(errDistance>15.0&&saveRouteTurn.get(turnIndex)!=201){
 	     	    			
 	     	    			routeIndex++;
-	        				
 	     	    			nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
 	     	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
 	     	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
@@ -881,125 +912,128 @@ public class MainActivity extends Activity {
 	     	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
 	     	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
 	     	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
-	     	    		}
-	
-	 	    			needTurn=saveRouteTurn.get(routeIndex);
-	 	    			
-	        			
-	     	    		if(needTurn==11){
-	        				imgs.setText(11+"");
-	        			}
-	    			}
-	
-	        		mMapView.setLocationPoint(correctionlon, correctionlat);
-	    			
-	    			
-	    			
-	            /*    if(radian==bearingP1toP2(priorlatMe,priorlonMe,
-	    					latMe, lonMe)){
-	                	rcount=0;
-	                }
-	                else if(rcount==3) needTurn = 201;
-	                else rcount++;
-	              */  
-	    			
-	                
-	    			TextView Distance=(TextView)findViewById(R.id.distance);
-	
-					
-	    			Distance.setText(errDistance+"");
-	    			
-	    			
-	    			//30미터 이전에 회전값을 출력해준다.               
-	    			if(nextDistance<=30.0)
+
+	        				
+	        				if(priorLat == saveRouteTurnPoint.get(turnIndex).getLatitude() &&
+	        						priorLon == saveRouteTurnPoint.get(turnIndex).getLongitude()) turnIndex++;
+	     	    	}
+	     	    	
+	     	    	while(true){
+	     	    	//어느 선이 더 가까운지 계산
+     	    		routeIndex++;
+     	    		nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+ 	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+ 	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+ 	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+ 	    		
+ 	    			nextDistance = distance(latMe, lonMe,
+ 	    					nextLat,nextLon );
+ 	    			priorDistance = distance(latMe, lonMe,
+ 	    	    					priorLat,priorLon );
+ 	   
+ 	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+ 	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+	 	    			if(errDistance<distance(latMe, lonMe,correctionlat,correctionlon)){
+	 	    				routeIndex--;
+	 	    	    		nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
+	     	    			nextLon=saveRoutePoint.get(routeIndex+1).getLongitude();
+	     	    			priorLat=saveRoutePoint.get(routeIndex).getLatitude();
+	     	    			priorLon=saveRoutePoint.get(routeIndex).getLongitude();
+	     	    		
+	     	    			nextDistance = distance(latMe, lonMe,
+	     	    					nextLat,nextLon );
+	     	    			priorDistance = distance(latMe, lonMe,
+	     	    	    					priorLat,priorLon );
+	     	   
+	     	    			correctionlat=(nextDistance*priorLat+priorDistance*nextLat)/(nextDistance+priorDistance);
+	     	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
+	     	    			break;
+	 	    			}
+	     	    	}
+     	
+ 	    			
+	 	   			if(priorLat == saveRouteTurnPoint.get(turnIndex).getLatitude() &&
+							priorLon == saveRouteTurnPoint.get(turnIndex).getLongitude()) turnIndex++;
+	 	   			turnDistance = distance(latMe, lonMe,saveRouteTurnPoint.get(turnIndex).getLatitude(),saveRouteTurnPoint.get(turnIndex).getLongitude() );
+	     	    	
+	 	   			
+	 	   			if(turnDistance<=30.0)
 	    			{
-	    				if(saveRouteTurn.get(routeIndex+1)!=11)
-	        	 		   imgs.setText(saveRouteTurn.get(routeIndex+1)+"");
+	    				if(saveRouteTurn.get(turnIndex)==12){
+	        	 		   imgs.setText(12+"");
+	        	 		   String data = "b";
+	        	 		   byte[] buffer = data.getBytes();
+	        	 		   mBTHandler.write(buffer);
+	    				}
+	    				else if(saveRouteTurn.get(turnIndex)==13){
+	    					imgs.setText(13+"");
+	    					String data = "c";
+		        	 		byte[] buffer = data.getBytes();
+		        	 		mBTHandler.write(buffer);
+	    				}
 	    			}
-	    			if(needTurn==201){
-	    				mLocMgr.removeUpdates(mLocListener);
-						Toast toast;
-			        	toast = Toast.makeText(MainActivity.this,
-								"위치탐색을 종료합니다.", Toast.LENGTH_LONG);
-							
-			        	toast.show();
-						islocation=false;
-						routeIndex=0;
-						priorlatMe=-1;
-						priorlonMe=-1;
-						
+	     	    	else{
+        				imgs.setText(11+"");
+        				String data = "a";
+        	 		   byte[] buffer = data.getBytes();
+        	 		   mBTHandler.write(buffer);
+        			}
+	 	   			
+	 	   			
+	    			if(saveRouteTurn.get(turnIndex)==201){
+	    				if(errDistance<15){
+	     	    			mLocMgr.removeUpdates(mLocListener);
+							Toast toast;
+				        	toast = Toast.makeText(MainActivity.this,
+									"목적지에 도달하였습니다 길안내를 종료합니다,", Toast.LENGTH_LONG);
+								
+				        	toast.show();
+							islocation=false;
+							routeIndex=0;
+							turnIndex=0;
+	     	    		}
+	    				else{
+		    				startPoint.setLatitude(latMe);
+		    		    	startPoint.setLongitude(lonMe);
+		    				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
+		    			    		new FindPathDataListenerCallback() {
+		    			    		public void onFindPathData(TMapPolyLine polyLine) {
+		    			    			polyLine.setLineColor(Color.GREEN);
+		    			    			mMapView.addTMapPath(polyLine);
+		    			    		}
+		    			    }
+		    				);
+		    				
+		    		    	
+		    		    	getJsonData(startPoint, endPoint);
+		    				
+		    				for(int i=0; i<saveRoutePoint.size(); i++)
+		        			{
+		        				TMapMarkerItem routeMarker = new TMapMarkerItem();
+		        				
+		        				routeMarker.setID("routeMarker"+i);
+		        				routeMarker.setTMapPoint(saveRoutePoint.get(i));
+		        				routeMarker.setVisible(routeMarker.VISIBLE);
+		        				Bitmap bitmap = BitmapFactory.decodeResource(getResources(),R.drawable.orange_small);
+		    			    	routeMarker.setIcon(bitmap);
+		    			    	routeMarker.setPosition((float)0.5, (float)0.5);
+		    			    	mMapView.addMarkerItem(routeMarker.getID(), routeMarker);
+		    			    	
+		        			}
+							routeIndex=0;
+							turnIndex=0;
+		    				}
 	    			}
 	    			
-	    			/*
-	    			if(distance(latMe, lonMe,
-	    					saveRoutePoint.get(routeIndex-1).getLatitude(), saveRoutePoint.get(routeIndex-1).getLongitude())<=10)
-	    			  switch(needTurn)
-	    			  {
-	    			  	case 11:
-	    			  	{
-	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
-	    			  		break;
-	    			  	} 
-	    			  	case 12:
-	    			  	{
-	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_left));
-	    			  		break;
-	      			    } 
-	    			  	case 13:
-	    			  	{
-	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_right));
-	    			  		break;
-	      			    }
-	    			  	case 201:
-	    			  	{
-	    			  		imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_end));
-	    			  		navigationMode = false;
-	    			  		saveDistance=40000;
-	    			  		routeIndex=1;
-	      			    }
-	    			  	
-	    			  	
-	    			  } 
-	    			else
-	    				imgs.setImageDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.red_arrow_forward));
-				  	*/
-	    			/*
-	    			ArrayList<TMapPoint> preRoutePoint = new ArrayList<TMapPoint>();
-	    			ArrayList<Integer> preRouteTurn = new ArrayList<Integer>();
-	    			
-	    			preRoutePoint = saveRoutePoint;
-	    			preRouteTurn = saveRouteTurn;
-	    			int check=0;
-	    			
-	    			TMapPoint moveMe = new TMapPoint(latMe, lonMe);
-	    			getJsonData(moveMe, endPoint);
-	    			
-	    			check = checkRoute(saveRoutePoint, preRoutePoint, saveRouteTurn, preRouteTurn);
-	    			
-	    			 Toast toastCheckCorrectRoute = Toast.makeText(MainActivity.this,
-	    						"check = "+ check, Toast.LENGTH_LONG);
-	    			 toastCheckCorrectRoute.show();
-	    			 
-	    			 if(check==3 || check==2)
-	    			 {
-	    				 saveRoutePoint = preRoutePoint;
-	    				 saveRouteTurn = preRouteTurn;
-	    			 }
-	    			 else if(check==1)
-	    			 {
-	    			 
-	    				 routeIndex=1;
-	    			 }
-	    			 else if(check==0)
-	    			 {
-	    				getJsonData(moveMe, endPoint);
-	    				routeIndex=1;
-	    			 }
-	    			 nextState(saveRouteTurn, check);
-	    			 */
+	    			mMapView.setLocationPoint(correctionlon, correctionlat);
 	    		}
+        		
+        		TextView Distance=(TextView)findViewById(R.id.distance);
+
+				
+    			Distance.setText(nextDistance+"");
+	    			
     		}
-			
         }
 
  
@@ -1123,6 +1157,16 @@ public class MainActivity extends Activity {
                    //Log.d(TAG, responseString);
 
                    String strData = "";
+                   
+                   
+                   for(int i=0;i<saveRoutePoint.size();i++){
+                	TMapMarkerItem routeMarker = new TMapMarkerItem();
+       				routeMarker.setID("routeMarker"+i);
+   			    	mMapView.removeMarkerItem(routeMarker.getID());
+   			    	
+                   }
+                   
+                   saveRouteTurnPoint.clear();
                    saveRoutePoint.clear();
                    saveRouteTurn.clear();
                 	
@@ -1159,7 +1203,10 @@ public class MainActivity extends Activity {
 				        	 jsonPolyline.addLinePoint(jsonPoint);
 				        	 Log.d(TAG, jsonPoint.getLatitude()+"-"+jsonPoint.getLongitude());
 				        	 
-				        	 saveRoutePoint.add(jsonPoint);
+				        	 int turnType = properties.getInt("turnType");
+						     saveRouteTurn.add(turnType);
+						     saveRouteTurnPoint.add(jsonPoint);
+				        	 //saveRoutePoint.add(jsonPoint);
 			        	 }
 			        	 if(geoType.equals("LineString"))
 			        	 {
@@ -1175,25 +1222,25 @@ public class MainActivity extends Activity {
 				        	
 				        	 jsonPolyline.addLinePoint(jsonPoint);
 				        	 Log.d(TAG, jsonPoint.getLatitude()+"-"+jsonPoint.getLongitude());
-				        	 
+				        	         
 				        	 saveRoutePoint.add(jsonPoint);
-				        	 saveRouteTurn.add(11);
+				        	 //saveRouteTurn.add(11);
 			        		 }
 			        	 }
-			        	 
+			        	 /*
 			        	 String nodeType = properties.getString("nodeType");
 			        	 
 			        	 if(nodeType.equals("POINT")){
 					        int turnType = properties.getInt("turnType");
-					        	
 					        saveRouteTurn.add(turnType);
+					        
 					        Log.d(TAG, "회전방향: "+turnType+"\n");
 					     }
 			        	 else if(nodeType.equals("LINE")){
 			        		 String description = properties.getString("description");
 			        		 Log.d(TAG, description+"\n");
 			        	 }
-			        				        			 
+			        		*/		        			 
 			        	
 			        	 
 			        }
@@ -1358,6 +1405,227 @@ public class MainActivity extends Activity {
     }
     return (short) true_bearing;
    }
+   //블루투스
+   private void overflowMenuInActionBar(){
+		 try {
+		        ViewConfiguration config = ViewConfiguration.get(this);
+		        Field menuKeyField = ViewConfiguration.class.getDeclaredField("sHasPermanentMenuKey");
+		        if(menuKeyField != null) {
+		            menuKeyField.setAccessible(true);
+		            menuKeyField.setBoolean(config, false);
+		        }
+		    } catch (Exception ex) {
+		        // 무시한다. 3.x 이 예외가 발생한다.
+		    	// 또, 타블릿 전용으로 만들어진 3.x 버전의 디바이스는 보통 하드웨어 버튼이 존재하지 않는다. 
+		    }
+	}
+
+   @Override
+   public boolean onCreateOptionsMenu(Menu menu) {
+       // Inflate the menu; this adds items to the action bar if it is present.
+       getMenuInflater().inflate(R.menu.main, menu);
+       mMenu=menu;
+       return true;
+   }
+
+   @Override
+   public boolean onOptionsItemSelected(MenuItem item) {
+		boolean connect = mClient.isConnection();
+		if(item.getItemId() == R.id.action_connect) {
+			if (!connect) {
+				mDeviceListDialog.show();
+			} else {
+				mBTHandler.close();
+			}
+			return true;
+		}
+		return true;
+	}
+   
+   		private void initDeviceListDialog() {
+			mDeviceArrayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.item_device);
+			ListView listView = new ListView(getApplicationContext());
+			listView.setAdapter(mDeviceArrayAdapter);
+			listView.setOnItemClickListener(new OnItemClickListener() {
+				@Override
+				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					String item =  (String) parent.getItemAtPosition(position); 
+					for(BluetoothDevice device : mBluetoothDevices) {
+						if(item.contains(device.getAddress())) {
+							connect(device);
+							mDeviceListDialog.cancel();
+						}
+					}
+				}
+			});
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Select bluetooth device");
+			builder.setView(listView);
+			builder.setPositiveButton("Scan",
+			 new DialogInterface.OnClickListener() {
+			  public void onClick(DialogInterface dialog, int id) {
+				  scanDevices();
+			  }
+			 });
+			mDeviceListDialog = builder.create();
+			mDeviceListDialog.setCanceledOnTouchOutside(false);
+		}
+		
+		private void addDeviceToArrayAdapter(BluetoothDevice device) {
+			if(mBluetoothDevices.contains(device)) { 
+				mBluetoothDevices.remove(device);
+				mDeviceArrayAdapter.remove(device.getName() + "\n" + device.getAddress());
+			}
+				mBluetoothDevices.add(device);
+				mDeviceArrayAdapter.add(device.getName() + "\n" + device.getAddress() );
+				mDeviceArrayAdapter.notifyDataSetChanged();
+			
+		}
+		
+		private void enableBluetooth() {
+			BluetoothSerialClient btSet =  mClient;
+			btSet.enableBluetooth(this, new OnBluetoothEnabledListener() {
+				@Override
+				public void onBluetoothEnabled(boolean success) {
+					if(success) {
+						getPairedDevices();
+					} else {
+						finish();
+					}
+				}
+			});
+		}
+	
+		/*
+		private void addText(String text) {
+		    mTextView.append(text);
+		    final int scrollAmount = mTextView.getLayout().getLineTop(mTextView.getLineCount()) - mTextView.getHeight();
+		    if (scrollAmount > 0)
+		    	mTextView.scrollTo(0, scrollAmount);
+		    else
+		    	mTextView.scrollTo(0, 0);
+		}
+		*/
+	
+		private void getPairedDevices() {
+			Set<BluetoothDevice> devices =  mClient.getPairedDevices();
+			for(BluetoothDevice device: devices) {
+				addDeviceToArrayAdapter(device);
+			}
+		}
+		
+		private void scanDevices() {
+			BluetoothSerialClient btSet = mClient;
+			btSet.scanDevices(getApplicationContext(), new OnScanListener() {
+				String message ="";
+				@Override
+				public void onStart() {
+					Log.d("Test", "Scan Start.");
+					mLoadingDialog.show();
+					message = "Scanning....";
+					mLoadingDialog.setMessage("Scanning....");
+					mLoadingDialog.setCancelable(true);
+					mLoadingDialog.setCanceledOnTouchOutside(false);
+					mLoadingDialog.setOnCancelListener(new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							BluetoothSerialClient btSet = mClient;
+							btSet.cancelScan(getApplicationContext());
+						}
+					});
+				}
+				
+				@Override
+				public void onFoundDevice(BluetoothDevice bluetoothDevice) {
+					addDeviceToArrayAdapter(bluetoothDevice);
+					message += "\n" + bluetoothDevice.getName() + "\n" + bluetoothDevice.getAddress();
+					mLoadingDialog.setMessage(message);
+				}
+				
+				@Override
+				public void onFinish() {
+					Log.d("Test", "Scan finish.");
+					message = "";
+					mLoadingDialog.cancel();
+					mLoadingDialog.setCancelable(false);
+					mLoadingDialog.setOnCancelListener(null);
+					mDeviceListDialog.show();
+				}
+			});
+		}
+		
+		private void connect(BluetoothDevice device) {
+			mLoadingDialog.setMessage("Connecting....");
+			mLoadingDialog.setCancelable(false);
+			mLoadingDialog.show();
+			BluetoothSerialClient btSet =  mClient;
+			btSet.connect(getApplicationContext(), device, mBTHandler);
+		}
+		
+		private BluetoothStreamingHandler mBTHandler = new BluetoothStreamingHandler() {
+			ByteBuffer mmByteBuffer = ByteBuffer.allocate(1024);
+			
+			@Override
+			public void onError(Exception e) {
+				mLoadingDialog.cancel();
+			//	addText("Messgae : Connection error - " +  e.toString() + "\n");
+				mMenu.getItem(0).setTitle(R.string.action_connect);
+			}
+			
+			@Override
+			public void onDisconnected() {
+				mMenu.getItem(0).setTitle(R.string.action_connect);
+				mLoadingDialog.cancel();
+			//	addText("Messgae : Disconnected.\n");
+			}
+			@Override
+			public void onData(byte[] buffer, int length) {
+				if(length == 0) return;
+				if(mmByteBuffer.position() + length >= mmByteBuffer.capacity()) {
+					ByteBuffer newBuffer = ByteBuffer.allocate(mmByteBuffer.capacity() * 2); 
+					newBuffer.put(mmByteBuffer.array(), 0,  mmByteBuffer.position());
+					mmByteBuffer = newBuffer;
+				} 
+				mmByteBuffer.put(buffer, 0, length);
+				if(buffer[length - 1] == '\0') {
+				//	addText(mClient.getConnectedDevice().getName() + " : " +
+				//			new String(mmByteBuffer.array(), 0, mmByteBuffer.position()) + '\n'); 
+					mmByteBuffer.clear();
+				}
+			}
+			
+			@Override
+			public void onConnected() {
+			//	addText("Messgae : Connected. " + mClient.getConnectedDevice().getName() + "\n");
+				mLoadingDialog.cancel();
+				mMenu.getItem(0).setTitle(R.string.action_disconnect);
+			}
+		
+		};
+		
+		protected void onDestroy() {
+			super.onDestroy();
+			mClient.claer();
+		};
+		
+		@Override
+		protected void onPause() {
+			mClient.cancelScan(getApplicationContext());
+			super.onPause();
+		}
+		
+		@Override
+		protected void onResume() {
+			super.onResume();
+		enableBluetooth();
+
+			
+		}
+		
+		private void initProgressDialog() {
+			 mLoadingDialog = new ProgressDialog(this);
+			 mLoadingDialog.setCancelable(false);
+		}
    
 }
 
