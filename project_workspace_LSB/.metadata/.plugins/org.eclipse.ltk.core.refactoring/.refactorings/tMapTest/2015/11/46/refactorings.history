@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename field &apos;txtCurrentSpeed&apos; in &apos;com.example.tmaptest.R.id&apos; to &apos;mainCurrentSpeed&apos;&#x0D;&#x0A;- Original project: &apos;tMapTest&apos;&#x0D;&#x0A;- Original element: &apos;com.example.tmaptest.R.id.txtCurrentSpeed&apos;&#x0D;&#x0A;- Renamed element: &apos;com.example.tmaptest.R.id.mainCurrentSpeed&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" delegate="false" deprecate="true" description="Rename field &apos;txtCurrentSpeed&apos;" flags="589830" getter="false" id="org.eclipse.jdt.ui.rename.field" input="/gen&lt;com.example.tmaptest{R.java[R[id^txtCurrentSpeed" name="mainCurrentSpeed" references="true" setter="false" stamp="1447497494879" textual="false" version="1.0"/>
+</session>

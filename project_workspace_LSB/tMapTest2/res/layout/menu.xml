@@ -62,19 +62,20 @@
     >
     
     	<Button
-    	    android:id="@+id/search"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_alignParentRight="true"
-    	    android:layout_marginRight="30dip"
-    	    android:text="Speedometer" />
+        android:id="@+id/search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dip"
+        android:text="속도계" 
+        />
 
    		<Button
-   		    android:id="@+id/map"
-   		    android:layout_width="111dp"
-   		    android:layout_height="wrap_content"
-   		    android:text="지도보기" />
-
+        android:id="@+id/map"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:text="지도보기"
+		/>
 	</LinearLayout>
 
 </LinearLayout>

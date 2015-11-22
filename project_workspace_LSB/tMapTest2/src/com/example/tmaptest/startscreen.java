@@ -29,6 +29,16 @@ public class startscreen extends Activity {
 
 	    			}
 				});
+		
+		findViewById(R.id.map).setOnClickListener(
+				new Button.OnClickListener() {
+	    			public void onClick(View v) {
+	                    Intent intent = new Intent(startscreen.this, SpeedometerActivity.class);
+
+                        startActivity(intent);
+
+	    			}
+				});
 	
 	}
 }

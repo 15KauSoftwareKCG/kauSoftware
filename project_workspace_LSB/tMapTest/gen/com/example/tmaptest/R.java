@@ -23,47 +23,66 @@ public final class R {
     }
     public static final class drawable {
         public static final int ic_launcher=0x7f020000;
-        public static final int pin_b_b_o=0x7f020001;
-        public static final int pin_b_bm_o=0x7f020002;
-        public static final int pin_b_m_o=0x7f020003;
-        public static final int pin_r_bm_o=0x7f020004;
-        public static final int pin_r_m_o=0x7f020005;
-        public static final int pin_r_s_simple=0x7f020006;
+        public static final int non=0x7f020001;
+        public static final int orange_small=0x7f020002;
+        public static final int pin_b_b_o=0x7f020003;
+        public static final int pin_b_bm_o=0x7f020004;
+        public static final int pin_b_m_o=0x7f020005;
+        public static final int pin_r_bm_o=0x7f020006;
+        public static final int pin_r_m_o=0x7f020007;
+        public static final int pin_r_s_simple=0x7f020008;
+        public static final int red_arrow=0x7f020009;
+        public static final int red_arrow_forward=0x7f02000a;
+        public static final int red_arrow_left=0x7f02000b;
+        public static final int red_arrow_right=0x7f02000c;
+        public static final int red_end=0x7f02000d;
     }
     public static final class id {
-        public static final int action_settings=0x7f080014;
+        public static final int action_connect=0x7f08001c;
+        public static final int action_settings=0x7f08001b;
         public static final int button1=0x7f080001;
-        public static final int button2=0x7f080002;
-        public static final int button3=0x7f080003;
-        public static final int button4=0x7f080004;
-        public static final int button7=0x7f080005;
-        public static final int cbutton1=0x7f080011;
-        public static final int delist=0x7f080012;
-        public static final int detail=0x7f080007;
-        public static final int editText1=0x7f080010;
+        public static final int button11=0x7f080018;
+        public static final int button14=0x7f080019;
+        public static final int button2=0x7f080004;
+        public static final int button3=0x7f080005;
+        public static final int button4=0x7f080006;
+        public static final int button7=0x7f080007;
+        public static final int cbutton1=0x7f080014;
+        public static final int delist=0x7f080015;
+        public static final int detail=0x7f080009;
+        public static final int distance=0x7f080003;
+        public static final int editText1=0x7f080013;
+        public static final int img=0x7f080002;
         public static final int mainRelativeLayout=0x7f080000;
-        public static final int map=0x7f08000f;
-        public static final int map1=0x7f080013;
-        public static final int pAddress=0x7f08000b;
-        public static final int pName=0x7f080009;
-        public static final int pPhone=0x7f08000a;
-        public static final int pbutton1=0x7f08000d;
-        public static final int pbutton2=0x7f08000c;
-        public static final int poiName=0x7f080006;
-        public static final int ptext=0x7f080008;
-        public static final int search=0x7f08000e;
+        public static final int map=0x7f080012;
+        public static final int map1=0x7f080016;
+        public static final int pAddress=0x7f08000d;
+        public static final int pName=0x7f08000b;
+        public static final int pPhone=0x7f08000c;
+        public static final int pbutton1=0x7f08000f;
+        public static final int pbutton2=0x7f080010;
+        public static final int pbutton3=0x7f08000e;
+        public static final int poiName=0x7f080008;
+        public static final int ptext=0x7f08000a;
+        public static final int search=0x7f080011;
+        public static final int speedRelativeLayout=0x7f080017;
+        public static final int txtCurrentSpeed=0x7f08001a;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int list_detail=0x7f030001;
-        public static final int marker_popup=0x7f030002;
-        public static final int menu=0x7f030003;
-        public static final int set_endpoint=0x7f030004;
+        public static final int item_device=0x7f030001;
+        public static final int list_detail=0x7f030002;
+        public static final int marker_popup=0x7f030003;
+        public static final int menu=0x7f030004;
+        public static final int set_endpoint=0x7f030005;
+        public static final int speed_activity=0x7f030006;
     }
     public static final class menu {
         public static final int main=0x7f070000;
     }
     public static final class string {
+        public static final int action_connect=0x7f050003;
+        public static final int action_disconnect=0x7f050004;
         public static final int action_settings=0x7f050002;
         public static final int app_name=0x7f050000;
         public static final int hello_world=0x7f050001;
