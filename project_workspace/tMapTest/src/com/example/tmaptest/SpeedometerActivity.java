@@ -327,7 +327,7 @@ public class SpeedometerActivity extends Activity implements LocationListener, G
 		);
 
         final ListView list = (ListView)dia.findViewById(R.id.delist);
-        final ListAdapter listadapter = new ListAdapter(dia.getContext(),popMarker,dia,MarkerPoint);
+        final ListAdapter listadapter = new ListAdapter(popMarker,dia,MarkerPoint);
 
 	    
 		// 확인창 버튼 클릭

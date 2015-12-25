@@ -159,6 +159,9 @@ public class MainActivity extends Activity {
 	int turnIndex = 0;
 	TMapOverlayItem tMapOverlayItem= new TMapOverlayItem();
 
+	Dialog popMarker;
+
+    
 	private final Handler mHandler = new Handler() {
 
 		@Override
@@ -333,7 +336,7 @@ public class MainActivity extends Activity {
 				}
 			   	);
 
-	    final Dialog popMarker = new Dialog(MainActivity.this);
+	    popMarker = new Dialog(MainActivity.this);
 	    popMarker.setContentView(R.layout.marker_popup);
 	    popMarker.setTitle("상세 정보");
 
@@ -505,8 +508,7 @@ public class MainActivity extends Activity {
 		    	mMapView.setCenterPoint(info.getTMapPoint().getLongitude(), info.getTMapPoint().getLatitude());
 		    	mMapView.setZoomLevel(info.getTMapZoomLevel());
 		    	if(islocation&&firstGps==1){
-		    		gps1.setBackgroundDrawable(null);
-		    		gps1.setText("안내시작");
+		    		gps1.setBackgroundDrawable((BitmapDrawable)getResources().getDrawable(R.drawable.navi));
 		    	}
 		    	dia.dismiss();
 		    }
@@ -895,9 +897,9 @@ public class MainActivity extends Activity {
  	    			correctionlon=(nextDistance*priorLon+priorDistance*nextLon)/(nextDistance+priorDistance);
  	    			errDistance = distance(latMe, lonMe,correctionlat,correctionlon);
 
- 	    			if(errDistance<=15||distance(nextLat, nextLon,priorLat,priorLon )<priorDistance){
- 	    				turnIndex++;
- 	    			}
+ 	    			if(errDistance<=15||distance(saveRouteTurnPoint.get(turnIndex).getLongitude(), saveRouteTurnPoint.get(turnIndex).getLatitude(),priorLon,priorLat )<priorDistance){
+ 	                    turnIndex++;
+ 	                 }
 
     			}
      	    	else{
@@ -939,7 +941,7 @@ public class MainActivity extends Activity {
 	        						priorLon == saveRouteTurnPoint.get(turnIndex).getLongitude()) turnIndex++;
 	     	    	}
 
-	     	    	while(true){
+	     	    	while(saveRouteTurn.get(turnIndex)!=201){
 	     	    	//어느 선이 더 가까운지 계산
      	    		routeIndex++;
      	    		nextLat=saveRoutePoint.get(routeIndex+1).getLatitude();
@@ -982,23 +984,45 @@ public class MainActivity extends Activity {
 	    			{
 	    				if(saveRouteTurn.get(turnIndex)==12){
 	        	 		   imgs.setText(12+"");
-	        	 		   String data = "b";
+	        	 		   String data = "l";
 	        	 		   byte[] buffer = data.getBytes();
 	        	 		   mBTHandler.write(buffer);
 	    				}
 	    				else if(saveRouteTurn.get(turnIndex)==13){
 	    					imgs.setText(13+"");
-	    					String data = "c";
+	    					String data = "r";
+		        	 		byte[] buffer = data.getBytes();
+		        	 		mBTHandler.write(buffer);
+	    				}
+	    				else if(saveRouteTurn.get(turnIndex)==11){
+	    					imgs.setText(11+"");
+	    					String data = "s";
+		        	 		byte[] buffer = data.getBytes();
+		        	 		mBTHandler.write(buffer);
+	    				}
+	    				else if(saveRouteTurn.get(turnIndex)==16){
+	    					imgs.setText(16+"");
+	    					String data = "e";
+		        	 		byte[] buffer = data.getBytes();
+		        	 		mBTHandler.write(buffer);
+	    				}
+	    				else if(saveRouteTurn.get(turnIndex)==17){
+	    					imgs.setText(17+"");
+	    					String data = "T";
+		        	 		byte[] buffer = data.getBytes();
+		        	 		mBTHandler.write(buffer);
+	    				}else if(saveRouteTurn.get(turnIndex)==18){
+	    					imgs.setText(18+"");
+	    					String data = "t";
+		        	 		byte[] buffer = data.getBytes();
+		        	 		mBTHandler.write(buffer);
+	    				}else if(saveRouteTurn.get(turnIndex)==19){
+	    					imgs.setText(19+"");
+	    					String data = "f";
 		        	 		byte[] buffer = data.getBytes();
 		        	 		mBTHandler.write(buffer);
 	    				}
 	    			}
-	     	    	else{
-        				imgs.setText(11+"");
-        				String data = "a";
-        	 		   byte[] buffer = data.getBytes();
-        	 		   mBTHandler.write(buffer);
-        			}
 
 
 	    			if(saveRouteTurn.get(turnIndex)==201){
@@ -1014,7 +1038,7 @@ public class MainActivity extends Activity {
 							routeIndex=0;
 							turnIndex=0;
 	     	    		}
-	    				if(errDistance>15){
+	    				else if(errDistance>15){
 		    				startPoint.setLatitude(latMe);
 		    		    	startPoint.setLongitude(lonMe);
 		    				tmapdata.findPathDataWithType(TMapPathType.BICYCLE_PATH, startPoint, endPoint,
@@ -1465,12 +1489,9 @@ public class MainActivity extends Activity {
 		}
 		//서치 버튼이 클릭 되었을 때
 		if(item.getItemId() == R.id.action_search) {
+			
 		    final Dialog dia = new Dialog(MainActivity.this);
-		    final Dialog popMarker = new Dialog(MainActivity.this);
-		    final TMapPoint MarkerPoint = new TMapPoint(latMe, lonMe);
-		    final TMapData tmapdata = new TMapData();
-		    final TMapPoint startPoint = new TMapPoint(latMe, lonMe);
-
+		    
 		    //이하 위에 버튼부분과 동일하게 추가함
 		    mMapView.setIconVisibility(false);
             //mMapView.setZoomLevel(16);
@@ -1493,7 +1514,7 @@ public class MainActivity extends Activity {
 			final ArrayList<TMapPoint> point = new ArrayList<TMapPoint>();
 
 	        final ListView list = (ListView)dia.findViewById(R.id.delist);
-	        final ListAdapter listadapter = new ListAdapter(dia.getContext(),popMarker,dia,MarkerPoint);
+	        final ListAdapter listadapter = new ListAdapter(popMarker,dia,MarkerPoint);
 
 
 			// 확인창 버튼 클릭
@@ -1552,17 +1573,8 @@ public class MainActivity extends Activity {
 			    		point.add(item.getPOIPoint());
 			    		mMapView.bringMarkerToFront(tMapMarkerItem);
 
-
-			    		//mMapView.addTMapPOIItem(poiItem);
-
-			    		//if(i==0) mMapView.setCenterPoint(item.getPOIPoint().getLongitude(), item.getPOIPoint().getLatitude());
 			    		mMapView.addMarkerItem(item.getPOIID(), tMapMarkerItem);
-			    		//mMapView.addMarkerItem2(item.getPOIID(), tMapMarkerItem2);
-				    	//mMapView.addTMapPOIItem(poiItem);
-
-			    		//mMapView.setZoomLevel(14);
-
-			    		//TMapInfo info = mMapView.getDisplayTMapInfo();
+			    	
 
 
 			    		} // for

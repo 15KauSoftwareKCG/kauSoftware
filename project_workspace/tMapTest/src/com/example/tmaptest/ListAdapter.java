@@ -28,8 +28,8 @@ public class ListAdapter extends BaseAdapter{
 	private TMapPoint endPoint;
 	private Dialog popMarker,dia;
 
-	public ListAdapter(Context context,Dialog popMarker,Dialog dia,TMapPoint endPoint) {
-		mContext = context; this.popMarker=popMarker; this.dia=dia; this.endPoint=endPoint;
+	public ListAdapter(Dialog popMarker,Dialog dia,TMapPoint endPoint) {
+		mContext = dia.getContext(); this.popMarker=popMarker; this.dia=dia; this.endPoint=endPoint;
 	}
 
 	@Override
@@ -62,9 +62,9 @@ public class ListAdapter extends BaseAdapter{
 			detailbutton.setOnClickListener(new Button.OnClickListener(){
 				@Override
 				public void onClick(View v) {
-					final TextView pName = (TextView)popMarker.findViewById(R.id.pName);
-					final TextView pPhone = (TextView)popMarker.findViewById(R.id.pPhone);
-					final TextView pAddress = (TextView)popMarker.findViewById(R.id.pAddress);
+					TextView pName = (TextView)popMarker.findViewById(R.id.pName);
+					TextView pPhone = (TextView)popMarker.findViewById(R.id.pPhone);
+					TextView pAddress = (TextView)popMarker.findViewById(R.id.pAddress);
 					
 					pName.setText("　이름: "+data.get(position).name);
 					if(data.get(position).telNo==null) pPhone.setText("　전화번호: ");
@@ -83,11 +83,13 @@ public class ListAdapter extends BaseAdapter{
 								+ " " + data.get(position).lowerAddrName 
 	    									+ " " + data.get(position).detailAddrName);
 					
-		    		}   
+		    		}
+					dia.dismiss();
 	    			popMarker.setTitle("상세 정보");
 	    			endPoint.setLatitude(data.get(position).getPOIPoint().getLatitude());
 					endPoint.setLongitude(data.get(position).getPOIPoint().getLongitude());
     				popMarker.show();
+    				
 				}
 			});
 		}

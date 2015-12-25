@@ -28,9 +28,7 @@ public class startscreen extends Activity {
 		setContentView(R.layout.nmenu);
 
 
-	    //�뒪�뵾�뱶瑜� �겢由��븯硫�
-	    ImageView img=(ImageView) findViewById(R.id.speed);
-	    img.setOnTouchListener(btnTouchListener);
+	    
 	    findViewById(R.id.speed).setOnClickListener(
 				new Button.OnClickListener() {
 	    			public void onClick(View v) {
@@ -44,10 +42,7 @@ public class startscreen extends Activity {
 
 
 
-	    //////////////////////////////////////////////////吏��룄蹂닿린瑜� �겢由��븯硫�
-		ImageView img2=(ImageView) findViewById(R.id.map2);
-		img.setOnTouchListener(btnTouchListener);
-	    findViewById(R.id.map2).setOnClickListener(
+	  findViewById(R.id.map2).setOnClickListener(
 				new Button.OnClickListener() {
 	    			public void onClick(View v) {
 	                    Intent intent = new Intent(startscreen.this, MainActivity.class);
@@ -58,19 +53,6 @@ public class startscreen extends Activity {
 				});
 
 	}
-
-	private OnTouchListener btnTouchListener = new OnTouchListener(){
-		public boolean onTouch (View v, MotionEvent event){
-			ImageView view =(ImageView)v;
-			if(event.getAction()==MotionEvent.ACTION_DOWN){
-
-				view.setColorFilter(0xaa111111, Mode.SRC_OVER);
-			}else if (event.getAction()==MotionEvent.ACTION_UP){
-				view.setColorFilter(0x00000000, Mode.SRC_OVER);
-			}
-			return false;
-			}
-		};
 
 	}
 
